@@ -12,6 +12,10 @@ test("main pushes run only serialized release automation", async () => {
   assert.doesNotMatch(workflow, /pull_request:|workflow_dispatch:/);
   assert.match(workflow, /group: release-main/);
   assert.match(workflow, /cancel-in-progress: false/);
+  assert.equal(
+    workflow.match(/github\.repository == '([^']+)'/)?.[1],
+    "ilokesto/ilokesto",
+  );
   assert.match(workflow, /actions: write/);
   assert.match(workflow, /contents: write/);
   assert.match(workflow, /pull-requests: write/);

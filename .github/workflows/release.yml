@@ -14,7 +14,7 @@ concurrency:
 jobs:
   release:
     if: >-
-      github.repository == 'ayden94/ilokesto' &&
+      github.repository == 'ilokesto/ilokesto' &&
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
