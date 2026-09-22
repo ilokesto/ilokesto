@@ -16,7 +16,7 @@ This repository is the single source of truth for the ilokesto library ecosystem
 ```
 ilokesto/
 ├── .changeset/             # Release declarations and configuration
-├── .github/workflows/      # CI, release, and docs sync
+├── .github/workflows/      # CI and release automation
 ├── .opencode/              # Project-local OpenCode agents, commands, and skills
 │   ├── agents/             # Custom subagent definitions (ilokesto-*)
 │   ├── commands/           # Slash command harnesses (*.md)
@@ -43,7 +43,7 @@ ilokesto/
 
 - **Independent versions**: Packages share Git history but retain separate versions and changelogs.
 - **One release control plane**: Changesets, lockfile, CI, and publishing are rooted here.
-- **Docs live with source**: Package docs remain beside source and `apps/docs` consumes the originals. Legacy sync workflows remain until production switches; see `DECISIONS/004-docs-in-monorepo.md`.
+- **Docs live with source**: Package docs remain beside source and the production `apps/docs` site consumes the originals. Do not restore cross-repository sync; see `DECISIONS/004-docs-in-monorepo.md`.
 - **Shared patterns over shared code**: Prefer conventions documented here before adding cross-package abstractions.
 
 ## OpenCode agent, command, and skill structure

@@ -168,7 +168,7 @@ permission:
 - `packages/<name>/docs/` Fumadocs 구조 준수
 - `packages/<name>/.npmignore`에 `docs/` 제외 여부
 - major changeset에 migration notes 존재 여부
-- `.github/workflows/sync-docs.yml` 트리거 경로
+- `apps/docs/source.config.ts`의 패키지 문서 연결과 기존 공개 URL 유지
 - `fetcher`의 `beta` dist-tag 정책
 
 ## Output

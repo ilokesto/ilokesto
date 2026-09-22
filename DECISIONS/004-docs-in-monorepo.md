@@ -26,26 +26,55 @@ pnpm docs:start
 Validate English and Korean package pages, navigation, search, and machine-readable
 documentation before switching production. Preserve existing public URLs.
 
-## Production transition
+## Production deployment
 
-This local migration does not change the production project, domain, or repository.
-The deployment provider's project configuration must be inspected before making
-external changes; it is not encoded in the source repository.
+Production switched to the monorepo on 2026-09-22 after explicit approval and
+preview verification. The existing Vercel `docs` project in
+`jeong-jinhos-projects` retains both public domains:
 
-After approval:
+- `ilokesto.ayden94.com`
+- `docs-omega-roan-17.vercel.app`
 
-1. Connect a preview deployment to `ilokesto/ilokesto`.
-2. Configure `apps/docs` as the application directory and permit access to files
-   outside that directory. Installation must use the root pnpm workspace and
-   lockfile; package documentation outside the app must be included.
-3. Use Node.js 22 and the pinned pnpm version. From the repository root, the build
-   command is `pnpm docs:build`. The application uses the Next.js deployment
-   integration, not a static-export directory.
-4. Verify the preview's bilingual routes, search, LLM endpoints, and image routes.
-5. Switch the existing production domain only after preview verification.
-6. Remove `.github/workflows/sync-docs-*.yml` and `_sync-docs.yml` after production
-   uses this monorepo. Until then they continue updating the existing site.
-7. Retire the old documentation repository only with explicit approval.
+Vercel project settings:
 
-Keep the old deployment available for rollback until the new production site is
-verified. Do not publish the documentation application to npm.
+| Setting | Value |
+| --- | --- |
+| Framework | Next.js |
+| Root directory | `apps/docs` |
+| Source files outside root directory | Enabled |
+| Skip unaffected projects | Disabled; package MDX lives outside `apps/docs` |
+| Node.js | `22.x` |
+| Install command | `cd ../.. && pnpm install --frozen-lockfile` |
+| Build command | `cd ../.. && pnpm docs:build` |
+| Output directory | Framework default; no static export |
+
+Both commands start independently in `apps/docs`. The workspace root pins pnpm
+and owns the lockfile. Changes to `packages/*/docs` must trigger site builds even
+though those files are outside the application directory.
+
+The Vercel GitHub app must have access to `ilokesto/ilokesto`, and the project's
+Git connection must use that repository with production branch `main`.
+Project settings and GitHub app repository access are external configuration;
+inspect them before changing deployment behavior.
+
+## Verification and retirement
+
+The transition verified all 318 canonical English/Korean document routes,
+including every one of the old site's 274 routes. Both languages passed home
+navigation, search, Markdown, and Open Graph image checks. `/llms.txt` and
+`/llms-full.txt` remained available without redirects.
+
+The first verified monorepo production deployment is
+`dpl_2HiWCL1JBqb2Mg1GcvEP6kBzDkVc`, built from commit
+`7e4c5380aa9585ae038bb9faae106f99f771c708` with Node.js 22.
+The legacy deployment `dpl_BsfgXmrTTz9nvR2U89uf22Agat88` remains available for
+rollback; do not delete it as part of repository cleanup.
+
+Cross-repository documentation-sync workflows are retired. Remove the unused
+`DOCS_SYNC_TOKEN` repository secret and delete `ilokesto/docs` only after the
+monorepo production deployment is verified and its Git connection is established.
+The old repository's documentation architecture guide is preserved in
+`apps/docs/DOCS_ARCHITECTURE.md`; its open sync PRs contain only documentation
+already retained in the monorepo's source or history.
+
+Do not publish the documentation application to npm.

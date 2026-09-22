@@ -52,7 +52,19 @@ For a package index, omit `<page>`.
 
 ## Deployment
 
-The application is private and excluded from npm releases. See
+The application is private and excluded from npm releases. The existing Vercel
+`docs` project serves `https://ilokesto.ayden94.com` from this workspace.
+Its root directory is `apps/docs`, with source files outside that directory
+enabled and Node.js 22 selected. From the application directory, Vercel runs:
+
+```sh
+cd ../.. && pnpm install --frozen-lockfile
+cd ../.. && pnpm docs:build
+```
+
+The install and build commands run independently from the application directory.
+Keep the root lockfile and package documentation available to both.
+Do not configure a static-export output directory or restore the legacy
+cross-repository sync workflows. See
 [`DECISIONS/004-docs-in-monorepo.md`](../../DECISIONS/004-docs-in-monorepo.md)
-for the deployment transition. This migration does not switch production or
-remove the legacy documentation-sync workflows.
+for deployment configuration and rollback information.

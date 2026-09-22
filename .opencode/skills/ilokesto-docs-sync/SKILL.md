@@ -1,6 +1,6 @@
 ---
 name: ilokesto-docs-sync
-description: Use when syncing a package's `docs/` folder to the central `ilokesto/docs` repository. Covers Fumadocs structure and the root `sync-docs.yml` workflow.
+description: Use when connecting package-owned docs to the production apps/docs workspace. Covers Fumadocs structure and direct source loading without cross-repository synchronization.
 compatibility: opencode
 metadata:
   language: en
@@ -12,18 +12,18 @@ metadata:
 
 ## Trigger
 
-Load this skill when connecting package documentation to `apps/docs`, or maintaining legacy synchronization during the production transition.
+Load this skill when connecting package documentation to `apps/docs`.
 
 ## Implementer routing
 
-- **Trigger sync workflow or create a no-op change**: `quick` category agent.
+- **Package collection configuration**: follow the existing `apps/docs/source.config.ts` pattern.
 - **Docs structure or Fumadocs questions**: `visual-engineering` category agent or `librarian`.
 
 ## Context to read
 
 - `apps/docs/README.md`
 - `DECISIONS/004-docs-in-monorepo.md`
-- `.github/workflows/_sync-docs.yml` and `sync-docs-*.yml` (legacy workflows)
+- `apps/docs/source.config.ts` and `apps/docs/DOCS_ARCHITECTURE.md`
 - `ARCHITECTURE.md` docs section
 - `packages/<name>/docs/` structure
 
@@ -32,7 +32,7 @@ Load this skill when connecting package documentation to `apps/docs`, or maintai
 - Ensure each package's `docs/` folder follows the Fumadocs structure (`meta.json`, `*.mdx`, `*.ko.mdx`).
 - Run `pnpm docs:test`, `pnpm docs:typecheck`, and `pnpm docs:build` locally.
 - Keep package content canonical in `packages/<name>/docs/`; site code belongs in `apps/docs`.
-- Preserve legacy sync until production uses this monorepo. External deployment changes require approval.
+- Production uses this monorepo directly; do not restore legacy sync. External deployment changes require approval.
 
 ## Must not do
 
