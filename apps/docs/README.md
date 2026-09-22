@@ -18,6 +18,9 @@ Open `http://localhost:3000/en` or `/ko`. All eight package sections use
 
 ## Content
 
+Follow [the documentation architecture guide](./DOCS_ARCHITECTURE.md) for
+page types, navigation, naming, and English/Korean parity.
+
 Edit `packages/<package>/docs`, not this application. `source.config.ts`
 defines a direct Fumadocs collection for each package. `lib/source.ts`
 prefixes collection paths with the package name to preserve public URLs.
