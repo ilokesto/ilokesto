@@ -34,7 +34,7 @@ external changes; it is not encoded in the source repository.
 
 After approval:
 
-1. Connect a preview deployment to `ayden94/ilokesto`.
+1. Connect a preview deployment to `ilokesto/ilokesto`.
 2. Configure `apps/docs` as the application directory and permit access to files
    outside that directory. Installation must use the root pnpm workspace and
    lockfile; package documentation outside the app must be included.
