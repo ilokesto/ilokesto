@@ -71,5 +71,5 @@ Each package owns its `docs/` folder. The private `apps/docs` Next.js/Fumadocs w
 ## Cross-cutting automation
 
 - **Release**: Root Changesets versioning and the gated release job in `.github/workflows/ci.yml` create release PRs and publish packages after verification. `fetcher` publishes on `beta`; stable packages publish on `latest`.
-- **Documentation**: Root build, typecheck, and tests include `apps/docs`. Existing package-scoped sync workflows continue updating `ilokesto/docs` until production is switched, then are removed.
+- **Documentation**: Root build, typecheck, and tests include `apps/docs`. Vercel builds this workspace directly with package-owned documentation; cross-repository sync workflows are retired.
 - **CI**: Root CI installs one lockfile, builds in dependency order, and preserves package-specific quality gates.
