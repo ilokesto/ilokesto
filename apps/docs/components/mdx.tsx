@@ -1,4 +1,5 @@
 import { cn } from '@/lib/cn';
+import { PackageDemo } from './demos/package-demo';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
 import type { ComponentPropsWithoutRef } from 'react';
@@ -20,6 +21,7 @@ export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
     code: Code,
+    PackageDemo,
     ...components,
   } satisfies MDXComponents;
 }

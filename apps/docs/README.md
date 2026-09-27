@@ -27,6 +27,17 @@ prefixes collection paths with the package name to preserve public URLs.
 English `.mdx` and Korean `.ko.mdx` pages share their package metadata.
 Fumadocs watches these source directories during development.
 
+Package indexes include `<PackageDemo name="store" lang="en" />` (with the
+appropriate package and locale). Implementations live in `components/demos`
+and import the real workspace packages. Each is loaded separately in the
+browser; static examples remain readable without JavaScript.
+
+`pnpm docs:dev` and `pnpm docs:typecheck` prepare the package distributions.
+`pnpm docs:build` builds the documentation and its workspace dependencies in
+dependency order, including on Vercel. If you edit package source while the
+documentation dev server is running, run `pnpm docs:prepare` to refresh the
+distributions used by demos.
+
 Site layout, search, localization, and route handlers live here. There is
 no copied or generated package-content directory to edit or synchronize.
 
@@ -35,6 +46,7 @@ no copied or generated package-content directory to edit or synchronize.
 ```sh
 pnpm docs:build
 pnpm docs:typecheck
+pnpm --filter @ilokesto/docs exec playwright install chromium
 pnpm docs:test
 pnpm docs:start
 ```
@@ -42,7 +54,9 @@ pnpm docs:start
 The build requires network access for the existing Google Inter font.
 The root build, typecheck, and test commands also include this application.
 The HTTP regression tests start an isolated production server, so build before
-running them. Run root typecheck and tests sequentially: some existing package
+running them. They also exercise the interactive examples in Chromium.
+The existing CI browser installation covers this dependency.
+Run root typecheck and tests sequentially: some existing package
 tests rebuild shared distribution files.
 
 Machine-readable routes include `/llms.txt`, `/llms-full.txt`, and

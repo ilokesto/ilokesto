@@ -14,6 +14,30 @@ importers:
 
   apps/docs:
     dependencies:
+      '@ilokesto/fetcher':
+        specifier: workspace:*
+        version: link:../../packages/fetcher
+      '@ilokesto/form':
+        specifier: workspace:*
+        version: link:../../packages/form
+      '@ilokesto/modal':
+        specifier: workspace:*
+        version: link:../../packages/modal
+      '@ilokesto/overlay':
+        specifier: workspace:*
+        version: link:../../packages/overlay
+      '@ilokesto/state':
+        specifier: workspace:*
+        version: link:../../packages/state
+      '@ilokesto/store':
+        specifier: workspace:*
+        version: link:../../packages/store
+      '@ilokesto/toast':
+        specifier: workspace:*
+        version: link:../../packages/toast
+      '@ilokesto/utilinent':
+        specifier: workspace:*
+        version: link:../../packages/utilinent
       '@takumi-rs/image-response':
         specifier: ^0.73.1
         version: 0.73.1
@@ -45,6 +69,9 @@ importers:
         specifier: ^3.5.0
         version: 3.6.0
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.61.1
+        version: 1.62.1
       '@tailwindcss/postcss':
         specifier: ^4.2.2
         version: 4.3.3

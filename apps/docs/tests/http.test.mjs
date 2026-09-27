@@ -4,12 +4,15 @@ import { readdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { after, before, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { chromium, expect } from '@playwright/test';
+import { demoBehaviors } from './demo-behaviors.mjs';
 
 const require = createRequire(import.meta.url);
 const appRoot = fileURLToPath(new URL('../', import.meta.url));
 const packages = ['store', 'state', 'form', 'overlay', 'modal', 'toast', 'utilinent', 'fetcher'];
 let server;
 let origin;
+let browser;
 
 before(async () => {
   await new Promise((resolve, reject) => {
@@ -39,9 +42,11 @@ before(async () => {
     server.stdout.on('data', onData);
     server.stderr.on('data', onData);
   });
+  browser = await chromium.launch();
 });
 
 after(async () => {
+  await browser?.close();
   if (!server || server.exitCode !== null) return;
   await new Promise((resolve) => {
     server.once('exit', resolve);
@@ -49,9 +54,56 @@ after(async () => {
   });
 });
 
+for (const lang of ['en', 'ko']) {
+  for (const packageName of packages) {
+    test(`${lang}/${packageName} index runs its real interactive example`, { timeout: 30_000 }, async () => {
+      const page = await browser.newPage();
+      const errors = [];
+      page.on('pageerror', error => errors.push(error.message));
+      try {
+        await page.goto(`${origin}/${lang}/${packageName}`);
+        await expect(page.locator(`[data-demo="${packageName}"]`)).toBeVisible();
+        await demoBehaviors[packageName](page);
+        assert.deepEqual(errors, []);
+      } finally {
+        await page.close();
+      }
+    });
+  }
+}
+
+test('demo HTTP service returns deterministic success and error payloads', async () => {
+  const success = await request('/api/demo/fetcher?outcome=success');
+  assert.equal(success.status, 200);
+  assert.equal((await success.json()).source, 'fictional-demo');
+  const failure = await request('/api/demo/fetcher?outcome=error');
+  assert.equal(failure.status, 503);
+  assert.equal((await failure.json()).error.code, 'DEMO_UNAVAILABLE');
+  assert.equal(failure.headers.get('cache-control'), 'no-store');
+});
+
+test('toast notifications are removed when client navigation unmounts the demo', { timeout: 30_000 }, async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(`${origin}/en/toast`);
+    await page.locator('[data-demo-action="toast-success"]').click();
+    await expect(page.locator('[data-demo-toast="success"]')).toBeVisible();
+    await Promise.all([
+      page.waitForURL(`${origin}/en`),
+      page.getByRole('link', { name: 'ilokesto', exact: true }).click(),
+    ]);
+    await expect(page.locator('[data-demo-toast]')).toHaveCount(0);
+    await page.locator('h4 a[href="/en/toast"]').click();
+    await expect(page.locator('[data-demo="toast"]')).toBeVisible();
+    await expect(page.locator('[data-demo-toast]')).toHaveCount(0);
+  } finally {
+    await page.close();
+  }
+});
+
 const request = (path) => fetch(`${origin}${path}`, { signal: AbortSignal.timeout(10_000) });
 
-test('every canonical bilingual page is served from the production build', async () => {
+test('every canonical bilingual page is served from the production build', { timeout: 30_000 }, async () => {
   const routes = [];
   for (const name of packages) {
     const files = await readdir(new URL(`../../../packages/${name}/docs/`, import.meta.url), { recursive: true });
@@ -74,7 +126,7 @@ test('every canonical bilingual page is served from the production build', async
       }
     }));
   }
-}, { timeout: 30_000 });
+});
 
 test('home navigation and search expose every package in both languages', async () => {
   for (const lang of ['en', 'ko']) {

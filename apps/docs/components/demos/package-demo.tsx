@@ -1,0 +1,39 @@
+'use client';
+
+import dynamic from 'next/dynamic';
+import { useParams } from 'next/navigation';
+import type { DemoProps } from './demo-frame';
+
+function LoadingDemo() {
+  const { lang } = useParams<{ lang: string }>();
+  return (
+    <p role="status" className="not-prose my-8 rounded-2xl border border-fd-border bg-fd-card p-6 text-sm text-fd-muted-foreground">
+      {lang === 'ko' ? '체험 예제를 불러오는 중입니다…' : 'Loading the interactive example…'}
+    </p>
+  );
+}
+
+const demos = {
+  store: dynamic(() => import('./store-demo').then((module) => module.StoreDemo), { ssr: false, loading: LoadingDemo }),
+  state: dynamic(() => import('./state-demo').then((module) => module.StateDemo), { ssr: false, loading: LoadingDemo }),
+  form: dynamic(() => import('./form-demo').then((module) => module.FormDemo), { ssr: false, loading: LoadingDemo }),
+  overlay: dynamic(() => import('./overlay-demo').then((module) => module.OverlayDemo), { ssr: false, loading: LoadingDemo }),
+  modal: dynamic(() => import('./modal-demo').then((module) => module.ModalDemo), { ssr: false, loading: LoadingDemo }),
+  toast: dynamic(() => import('./toast-demo').then((module) => module.ToastDemo), { ssr: false, loading: LoadingDemo }),
+  fetcher: dynamic(() => import('./fetcher-demo').then((module) => module.FetcherDemo), { ssr: false, loading: LoadingDemo }),
+  utilinent: dynamic(() => import('./utilinent-demo').then((module) => module.UtilinentDemo), { ssr: false, loading: LoadingDemo }),
+};
+
+export function PackageDemo({ name, lang }: DemoProps & { readonly name: keyof typeof demos }) {
+  const Demo = demos[name];
+  return (
+    <div data-demo-slot={name}>
+      <Demo lang={lang} />
+      <noscript>
+        {lang === 'ko'
+          ? '직접 체험하려면 JavaScript를 켜세요. 아래 예제 코드와 빠른 시작 문서는 그대로 읽을 수 있습니다.'
+          : 'Enable JavaScript to try the demo. The example code and quick-start documentation below remain available.'}
+      </noscript>
+    </div>
+  );
+}
