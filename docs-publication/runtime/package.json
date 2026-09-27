@@ -1,0 +1,35 @@
+{
+  "name": "@ilokesto/docs-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./store-landing": "./.generated/store/store-landing.tsx",
+    "./store-demo": "./.generated/store/store-demo.tsx",
+    "./state-demo": "./.generated/state/state-demo.tsx",
+    "./form-demo": "./.generated/form/form-demo.tsx",
+    "./overlay-demo": "./.generated/overlay/overlay-demo.tsx",
+    "./modal-demo": "./.generated/modal/modal-demo.tsx",
+    "./toast-demo": "./.generated/toast/toast-demo.tsx",
+    "./fetcher-demo": "./.generated/fetcher/fetcher-demo.tsx",
+    "./utilinent-demo": "./.generated/utilinent/utilinent-demo.tsx"
+  },
+  "dependencies": {
+    "@ilokesto/released-store": "npm:@ilokesto/store@2.0.0",
+    "@ilokesto/released-state": "npm:@ilokesto/state@2.0.0",
+    "@ilokesto/released-form": "npm:@ilokesto/form@2.0.0",
+    "@ilokesto/released-overlay": "npm:@ilokesto/overlay@2.0.0",
+    "@ilokesto/released-modal": "npm:@ilokesto/modal@2.0.0",
+    "@ilokesto/released-toast": "npm:@ilokesto/toast@2.0.0",
+    "@ilokesto/released-fetcher": "npm:@ilokesto/fetcher@1.0.0",
+    "@ilokesto/released-utilinent": "npm:@ilokesto/utilinent@1.2.0",
+    "ky": "1.14.3",
+    "lucide-react": "1.41.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
+  }
+}

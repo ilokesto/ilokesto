@@ -37,6 +37,11 @@
 .intro h1 span { color: var(--muted); }
 .tagline { font-size: 18px; margin-top: 12px; letter-spacing: -.035em; word-break: keep-all; max-width: 30ch; }
 .beta { margin-top: 12px; font-size: 12px; font-weight: 650; }
+.storeVersion { margin-top: 12px; font-size: 12px; line-height: 1.6; max-width: 42ch; }
+.storeVersion nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.storeVersion a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 4px; }
+.storeVersion a[aria-current='page'] { font-weight: 750; text-decoration: none; }
+.storeVersion p { margin: 0; word-break: keep-all; }
 .packageWorkspace { position: relative; margin-left: 51%; width: 43%; max-width: 620px; padding: 48px 0 128px; }
 .sceneDemo { min-width: 0; }
 .sceneControls {

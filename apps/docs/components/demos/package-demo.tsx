@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
+import { isDevelopmentDocs, publishedPackages } from '@/lib/publication';
 import type { DemoProps } from './demo-frame';
 
 function LoadingDemo() {
@@ -24,10 +25,23 @@ const demos = {
   utilinent: dynamic(() => import('./utilinent-demo').then((module) => module.UtilinentDemo), { ssr: false, loading: LoadingDemo }),
 };
 
+const releasedDemos = {
+  store: dynamic(() => import('@ilokesto/docs-runtime/store-demo').then(module => module.StoreDemo), { ssr: false, loading: LoadingDemo }),
+  state: dynamic(() => import('@ilokesto/docs-runtime/state-demo').then(module => module.StateDemo), { ssr: false, loading: LoadingDemo }),
+  form: dynamic(() => import('@ilokesto/docs-runtime/form-demo').then(module => module.FormDemo), { ssr: false, loading: LoadingDemo }),
+  overlay: dynamic(() => import('@ilokesto/docs-runtime/overlay-demo').then(module => module.OverlayDemo), { ssr: false, loading: LoadingDemo }),
+  modal: dynamic(() => import('@ilokesto/docs-runtime/modal-demo').then(module => module.ModalDemo), { ssr: false, loading: LoadingDemo }),
+  toast: dynamic(() => import('@ilokesto/docs-runtime/toast-demo').then(module => module.ToastDemo), { ssr: false, loading: LoadingDemo }),
+  fetcher: dynamic(() => import('@ilokesto/docs-runtime/fetcher-demo').then(module => module.FetcherDemo), { ssr: false, loading: LoadingDemo }),
+  utilinent: dynamic(() => import('@ilokesto/docs-runtime/utilinent-demo').then(module => module.UtilinentDemo), { ssr: false, loading: LoadingDemo }),
+};
+
 export function PackageDemo({ name, lang }: DemoProps & { readonly name: keyof typeof demos }) {
-  const Demo = demos[name];
+  const pathname = usePathname();
+  const development = isDevelopmentDocs(pathname.split('/').filter(Boolean).slice(1));
+  const Demo = development ? demos[name] : releasedDemos[name];
   return (
-    <div data-demo-slot={name}>
+    <div data-demo-slot={name} data-demo-runtime={development ? 'workspace' : publishedPackages[name].version}>
       <Demo lang={lang} />
       <noscript>
         {lang === 'ko'

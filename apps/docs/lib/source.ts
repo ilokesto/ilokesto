@@ -5,6 +5,8 @@ import {
   overlay,
   state,
   store,
+  storeReleased, stateReleased, formReleased, overlayReleased,
+  modalReleased, toastReleased, utilinentReleased, fetcherReleased,
   toast,
   utilinent,
 } from 'collections/server';
@@ -14,38 +16,51 @@ import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import type { Node, Root } from 'fumadocs-core/page-tree';
 import { i18n } from '@/lib/i18n';
 import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
+import { isDevelopmentDocs, scopeDevelopmentLink } from './publication';
 
 const packageCollections = {
-  store,
-  state,
-  form,
-  overlay,
-  modal,
-  toast,
-  utilinent,
-  fetcher,
+  store: storeReleased,
+  state: stateReleased,
+  form: formReleased,
+  overlay: overlayReleased,
+  modal: modalReleased,
+  toast: toastReleased,
+  utilinent: utilinentReleased,
+  fetcher: fetcherReleased,
 };
 
-const docs = Object.entries(packageCollections).flatMap(([packageName, collection]) =>
-  collection.docs.map((doc) => ({
-    ...doc,
-    info: { ...doc.info, path: `${packageName}/${doc.info.path}` },
-  })),
-);
-const meta = Object.entries(packageCollections).flatMap(([packageName, collection]) =>
-  collection.meta.map((entry) => ({
-    ...entry,
-    info: { ...entry.info, path: `${packageName}/${entry.info.path}` },
-  })),
-);
+const developmentCollections = { store, state, form, overlay, modal, toast, utilinent, fetcher };
+type Collection = (typeof packageCollections)[keyof typeof packageCollections]
+  | (typeof developmentCollections)[keyof typeof developmentCollections];
 
-// Prefix each direct package collection at aggregation time to preserve /:lang/:package URLs.
-export const source = loader({
-  baseUrl: docsRoute,
-  source: toFumadocsSource(docs, meta),
-  i18n,
-  plugins: [lucideIconsPlugin()],
-});
+function createSource(collections: readonly (readonly [string, Collection])[]) {
+  const docs = collections.flatMap(([prefix, collection]) =>
+    collection.docs.map(doc => ({
+      ...doc,
+      info: { ...doc.info, path: `${prefix}/${doc.info.path}` },
+    })),
+  );
+  const meta = collections.flatMap(([prefix, collection]) =>
+    collection.meta.map(entry => ({
+      ...entry,
+      info: { ...entry.info, path: `${prefix}/${entry.info.path}` },
+    })),
+  );
+  return loader({
+    baseUrl: docsRoute,
+    source: toFumadocsSource(docs, meta),
+    i18n,
+    plugins: [lucideIconsPlugin()],
+  });
+}
+
+const publicCollections = Object.entries(packageCollections);
+const nextCollections = Object.entries(developmentCollections)
+  .map(([name, collection]) => [`${name}/next`, collection] as const);
+
+export const publicSource = createSource(publicCollections);
+export const developmentSource = createSource(nextCollections);
+export const source = createSource([...publicCollections, ...nextCollections]);
 
 const koreanSidebarLabels: Record<string, string> = {
   'Getting Started': '시작하기',
@@ -135,8 +150,8 @@ function localizeKoreanSidebarNode(node: Node): Node {
   };
 }
 
-export function getDocsPageTree(locale: string): Root {
-  const tree = source.getPageTree(locale);
+export function getDocsPageTree(locale: string, next = false): Root {
+  const tree = (next ? developmentSource : publicSource).getPageTree(locale);
 
   if (locale !== 'ko') return tree;
 
@@ -174,8 +189,12 @@ export function getPageMarkdownUrl(page: InferPageType<typeof source>) {
 
 export async function getLLMText(page: InferPageType<typeof source>) {
   const processed = await page.data.getText('processed');
+  const content = isDevelopmentDocs(page.slugs)
+    ? processed.replace(/(\]\()(\/(?:en|ko)\/[^\s)"']+)/g,
+        (_match, prefix: string, href: string) => prefix + scopeDevelopmentLink(href))
+    : processed;
 
   return `# ${page.data.title} (${page.url})
 
-${processed}`;
+${content}`;
 }

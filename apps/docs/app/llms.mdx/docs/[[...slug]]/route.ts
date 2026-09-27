@@ -1,5 +1,6 @@
 import { getLLMText, getPageMarkdownUrl, source } from '@/lib/source';
 import { notFound } from 'next/navigation';
+import { isDevelopmentDocs } from '@/lib/publication';
 
 export const revalidate = false;
 
@@ -15,6 +16,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/llms.mdx/doc
   return new Response(await getLLMText(page), {
     headers: {
       'Content-Type': 'text/markdown',
+      ...(isDevelopmentDocs(page.slugs) ? { 'X-Robots-Tag': 'noindex' } : {}),
     },
   });
 }

@@ -15,6 +15,8 @@ pnpm docs:dev
 
 Open `http://localhost:3000/en` or `/ko`. All eight package sections use
 `/<language>/<package>` without a `/docs` prefix.
+Those routes show the selected published release. Edit and preview current
+workspace documentation at `/<language>/<package>/next`.
 
 ## Content
 
@@ -25,7 +27,8 @@ Edit `packages/<package>/docs`, not this application. `source.config.ts`
 defines a direct Fumadocs collection for each package. `lib/source.ts`
 prefixes collection paths with the package name to preserve public URLs.
 English `.mdx` and Korean `.ko.mdx` pages share their package metadata.
-Fumadocs watches these source directories during development.
+Fumadocs watches these source directories for the `next` channel. Public
+collections use verified snapshots selected by `docs-publication/active.json`.
 
 Package index routes use the illustration-led presentation in
 `components/landings`, with original assets in `public/illustrations`.
@@ -33,8 +36,10 @@ Each index links to its quick-start document in the standard documentation
 layout. The canonical package MDX remains the source for metadata, search,
 Markdown and full documentation content; it is not copied into the app.
 
-Interactive implementations live in `components/demos` and import the real
-workspace packages. Each is loaded separately in the browser. `DemoFrame`
+Development implementations live in `components/demos` and import the real
+workspace packages. Published implementations come from frozen example source
+and exact npm dependencies in the private `@ilokesto/docs-runtime` workspace.
+Each is loaded separately in the browser. `DemoFrame`
 provides the floating controls and core-code panel; Store has a compact
 counter-specific composition. JavaScript-free visitors retain the index
 overview and documentation link, and full examples in the detailed docs.
@@ -50,9 +55,14 @@ no copied or generated package-content directory to edit or synchronize.
 
 ## Verification
 
+The Store-only flag is retired. All ordinary builds now use the complete
+publication manifest; no runtime environment flag selects a different corpus.
+The historical 1.1.2 artifact remains a regression fixture, not a public route.
+
 ```sh
 pnpm docs:build
 pnpm docs:typecheck
+pnpm docs:publication:verify
 pnpm --filter @ilokesto/docs exec playwright install chromium
 pnpm docs:test
 pnpm docs:start
@@ -70,6 +80,13 @@ Machine-readable routes include `/llms.txt`, `/llms-full.txt`, and
 `/llms.mdx/docs/<language>/<package>/<page>/content.md`.
 Open Graph images use `/og/docs/<language>/<package>/<page>/image.webp`.
 For a package index, omit `<page>`.
+Development equivalents insert `/next` after the package name. The default
+search and LLM endpoints contain only released pages; `/api/search/next` and
+`/llms-next.txt` expose development pages. Development HTML, Markdown and OG
+responses carry noindex.
+
+Publication and rollback instructions are in
+[`docs-publication/README.md`](../../docs-publication/README.md).
 
 ## Deployment
 

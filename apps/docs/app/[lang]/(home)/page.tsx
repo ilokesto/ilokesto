@@ -2,6 +2,7 @@ import { packageMetadata } from '@/lib/layout.shared';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { publishedPackages } from '@/lib/publication';
 
 import { homeCopy, packageCards, packageGroups, type Locale, type PackageCard } from './home-content';
 
@@ -14,7 +15,8 @@ function PackageCard({ lang, locale, card }: { lang: string; locale: Locale; car
   const copy = homeCopy[locale];
 
   return (
-    <article className="flex h-full flex-col rounded-sm border border-fd-border bg-fd-background/80 p-5 transition-colors hover:bg-fd-accent/50">
+    <article data-docs-channel="released"
+      className="flex h-full flex-col rounded-sm border border-fd-border bg-fd-background/80 p-5 transition-colors hover:bg-fd-accent/50">
       <span
         className={`mb-5 h-1.5 w-10 ${packageMetadata[pkg].colorClass}`}
         aria-hidden="true"
@@ -27,6 +29,9 @@ function PackageCard({ lang, locale, card }: { lang: string; locale: Locale; car
           @ilokesto/{pkg}
         </Link>
       </h4>
+      <p className="mt-2 font-mono text-xs text-fd-muted-foreground">
+        v{publishedPackages[pkg].version}
+      </p>
       <p className="mt-2 flex-1 text-sm leading-6 text-fd-muted-foreground break-keep">
         {card.descriptions[locale]}
       </p>

@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-27T07:35:04.635Z",
+  "packages": {
+    "store": {
+      "name": "@ilokesto/store",
+      "version": "2.0.0",
+      "channel": "latest",
+      "distTags": {
+        "latest": "2.0.0"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/store/-/store-2.0.0.tgz",
+      "integrity": "sha512-ezW/FizFYp6yV/cwdIi7KrDN01sSRS38CC48ozkwm6UyIs0N7dNjaWaZOlVmZCieHWm9pQKxD1Z+7EVnYet82A==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:12:38.435Z"
+    },
+    "state": {
+      "name": "@ilokesto/state",
+      "version": "2.0.0",
+      "channel": "latest",
+      "distTags": {
+        "latest": "2.0.0"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/state/-/state-2.0.0.tgz",
+      "integrity": "sha512-GOg2Ovmq8qqqQfozizHhQ4hV+kWQ8DmmYmKsQJCMOZpAfG2nDqt5j8sl2jMJ0PdHWr13UJQ+ZQpTDH8Qy5m7IQ==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:16:00.412Z"
+    },
+    "form": {
+      "name": "@ilokesto/form",
+      "version": "2.0.0",
+      "channel": "latest",
+      "distTags": {
+        "latest": "2.0.0"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/form/-/form-2.0.0.tgz",
+      "integrity": "sha512-+cwHb++t/kuCd8j1IHngHzlTx79GLKlaAjPJPyCvyl96FogzGkV+PYU7zWHntMj0i9RXumGYsw3fC4X6EPwMuQ==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:12:48.604Z"
+    },
+    "overlay": {
+      "name": "@ilokesto/overlay",
+      "version": "2.0.0",
+      "channel": "latest",
+      "distTags": {
+        "latest": "2.0.0"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/overlay/-/overlay-2.0.0.tgz",
+      "integrity": "sha512-g3nHsweF+cl51vG95oq+C0dE5WA+G2HAXBrnrBUq5IdU2NfkiQ1EbWEsELl1/EPMFwsfnOiguaC0vT8PB/Z/sg==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:13:32.739Z"
+    },
+    "modal": {
+      "name": "@ilokesto/modal",
+      "version": "2.0.0",
+      "channel": "latest",
+      "distTags": {
+        "latest": "2.0.0"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/modal/-/modal-2.0.0.tgz",
+      "integrity": "sha512-ORXDt6x2uJPFGu2CZgsNM+mLonzhpFfZH8d7/oSS7gTEmIsLaxMdfyXldb5gsDLNT1UxJyOVfrgkEU7af8ckQw==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:12:53.878Z"
+    },
+    "toast": {
+      "name": "@ilokesto/toast",
+      "version": "2.0.0",
+      "channel": "latest",
+      "distTags": {
+        "latest": "2.0.0"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/toast/-/toast-2.0.0.tgz",
+      "integrity": "sha512-n9nRqwC97SN/8ruE5mguRiT5EWg+Qi57zEAvx7tbkPoyhP9FbRAVDAJKq2+kOUrWTn2WpAei6zMMCxV20c9G9g==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:12:55.788Z"
+    },
+    "fetcher": {
+      "name": "@ilokesto/fetcher",
+      "version": "1.0.0",
+      "channel": "beta",
+      "distTags": {
+        "beta": "1.0.0",
+        "latest": "1.0.0-beta.1"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/fetcher/-/fetcher-1.0.0.tgz",
+      "integrity": "sha512-fzhRTXxkss9U9hwcxx4iJ9a2pStg4pBPQOvw3g3xdoR3wHoY+DF1mBFRTV5yVo/bQf9giuYF1SdPiULqxt3k9A==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:13:02.691Z"
+    },
+    "utilinent": {
+      "name": "@ilokesto/utilinent",
+      "version": "1.2.0",
+      "channel": "latest",
+      "distTags": {
+        "latest": "1.2.0"
+      },
+      "tarball": "https://registry.npmjs.org/@ilokesto/utilinent/-/utilinent-1.2.0.tgz",
+      "integrity": "sha512-qyiB9JvHFqX/eIYz3CXEI5BNJ87dGTMWTAxsnkfOGn9bX5l3QsKKa40ZMqOxCel3lPn1bbU0iFbdLNS4OmXI7A==",
+      "sourceCommit": null,
+      "publishedAt": "2026-09-27T07:13:04.748Z"
+    }
+  }
+}
