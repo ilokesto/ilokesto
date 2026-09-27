@@ -163,3 +163,43 @@ Before shipping a new package section, check:
 - Are optional sections justified by content volume?
 - Do the onward links point to the next likely reader question?
 - Are English and Korean pages both complete?
+
+## 12. Onboarding editorial standard
+
+Write for a developer choosing a tool and trying it for the first time.
+
+- Start with the user's task and the observable result, not internal data
+  structures or a list of exported types.
+- Explain adjacent choices: `store` versus `state`, and `overlay` versus
+  `modal` or `toast`. Link to the alternative when it better fits the task.
+- Keep the index example short. Put the complete installation and application
+  setup in quick start, including imports, providers, required styles, and
+  framework prerequisites.
+- Give each runnable example an expected result and explain how to trigger it.
+  Distinguish a complete example from a fragment that extends an earlier one.
+- Verify examples against the actual public exports and behavior. State a beta
+  installation channel where required; do not describe unreleased APIs as
+  available in the current npm release.
+- Use reference pages for exact defaults, return values, lifecycle constraints,
+  and failure behavior. Use guides for completing a user task.
+- End introductory pages with a small set of next steps. Keep useful deep
+  references, rather than shortening every page to the same template.
+- Translate the complete journey, including outcomes and caveats. Keep API
+  identifiers unchanged and use natural Korean for explanatory labels.
+
+## 13. Documentation improvement verification
+
+Before handing off a documentation change:
+
+- Run `pnpm docs:typecheck`, `pnpm docs:build`, and `pnpm docs:test`.
+- Execute changed quick-start examples against the stated package API; a
+  successful MDX build does not prove that example code works.
+- Check both languages through home, package selection, quick start, and an API
+  page, including search and switching languages.
+- Check desktop and mobile layouts for body, code, table, and navigation
+  overflow, and verify keyboard access to interactive controls.
+- Preserve public routes and check Markdown, Open Graph images, `/llms.txt`,
+  and `/llms-full.txt`.
+
+Documentation publication timing and release-version selection are a separate
+deployment concern; editorial changes must not silently alter those policies.

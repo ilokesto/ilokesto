@@ -66,7 +66,12 @@ test('every canonical bilingual page is served from the production build', async
       const response = await request(route);
       assert.equal(response.status, 200, route);
       assert.match(response.headers.get('content-type'), /text\/html/);
-      await response.arrayBuffer();
+      const html = await response.text();
+      for (const [, href] of html.matchAll(/href="([^"]+)"/g)) {
+        const target = new URL(href.replaceAll('&amp;', '&'), `${origin}${route}`);
+        if (target.origin !== origin || !/^\/(?:en|ko)\//.test(target.pathname)) continue;
+        assert.ok(routes.includes(target.pathname.replace(/\/$/, '')), `${route} links to missing ${target.pathname}`);
+      }
     }));
   }
 }, { timeout: 30_000 });
@@ -76,6 +81,12 @@ test('home navigation and search expose every package in both languages', async 
     const home = await (await request(`/${lang}`)).text();
     for (const name of packages) {
       assert.ok(home.includes(`href="/${lang}/${name}"`), `${lang}/${name}`);
+      assert.ok(home.includes(`href="/${lang}/${name}/quick-start"`), `${lang}/${name}/quick-start`);
+      const intro = await (await request(`/${lang}/${name}`)).text();
+      assert.ok(intro.includes(`href="/${lang}/${name}/quick-start"`), `${lang}/${name} has no quick-start link`);
+      const quickStart = await request(`/${lang}/${name}/quick-start`);
+      assert.equal(quickStart.status, 200, `${lang}/${name}/quick-start`);
+      await quickStart.arrayBuffer();
     }
     const response = await request(`/api/search?query=store&locale=${lang}`);
     assert.equal(response.status, 200);
