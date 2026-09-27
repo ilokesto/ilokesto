@@ -54,14 +54,19 @@ approval of the prototype.
 
 ## Existing system
 
-### Store publication pilot
+### Published and development documentation
 
-- The opt-in Store pilot adds compact version links using existing typography,
+- Every package uses compact version links using existing typography,
   neutral borders and 44px link targets; it does not redesign the illustrations.
 - Released pages show the exact npm version. Next pages show a clear
   unpublished-content notice and preserve the version when switching language.
-- A pilot notice explains that only Store is frozen; other packages still use
-  development sources. Normal builds do not show this pilot UI.
+- Public pages use frozen documentation and examples from the selected npm
+  release. Development pages live under the explicit package `next` path.
+- Version switching preserves a matching document or returns to the selected
+  channel's index. Language switching keeps the selected channel.
+- Keep the existing illustrated scenes, layout, controls and motion unchanged.
+- Landings use a compact version row with an explicit unreleased link label;
+  detailed provenance text belongs in the document layout, clear of the artwork.
 
 Use the existing Fumadocs neutral theme, Tailwind utilities, package color
 metadata, and ilokesto logo. The site supports light and dark themes. Do not

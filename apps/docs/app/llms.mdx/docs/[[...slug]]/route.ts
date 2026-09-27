@@ -1,6 +1,6 @@
 import { getLLMText, getPageMarkdownUrl, source } from '@/lib/source';
 import { notFound } from 'next/navigation';
-import { isDevelopmentDocs } from '@/lib/store-publication';
+import { isDevelopmentDocs } from '@/lib/publication';
 
 export const revalidate = false;
 

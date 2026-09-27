@@ -1,6 +1,6 @@
 ---
 ---
 
-Add an opt-in Store 1.1.2 documentation publication pilot with an immutable npm
-snapshot, release-bound counter runtime, and separate development discovery.
-Ordinary documentation builds and package releases remain unchanged.
+Publish release-aligned documentation for all eight packages using immutable
+document/example snapshots, verified npm runtime dependencies, and separate
+main-tracking development routes and discovery. Package releases are unchanged.

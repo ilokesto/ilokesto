@@ -10,8 +10,10 @@ dist/
 !docs-publication/snapshots/**/dist/
 !docs-publication/snapshots/**/dist/**
 docs-publication/.generated/
+docs-publication/runtime/.generated/
 .DS_Store
 *.tgz
+!docs-publication/releases/**/npm/package.tgz
 *.log
 
 # Codegraph symlink (local index)

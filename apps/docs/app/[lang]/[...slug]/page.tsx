@@ -10,21 +10,23 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { StoreLanding } from '@/components/landings/store-landing';
 import { PackageLanding } from '@/components/landings/package-landing';
 import { getLandingPackage } from '@/components/landings/landing-packages';
-import { PublishedStoreLanding } from '@/components/landings/published-store-landing';
-import { StoreVersion } from '@/components/landings/store-version';
-import { getStoreDocsChannel, isDevelopmentDocs, isStoreIndex, scopeStoreNextLink } from '@/lib/store-publication';
+import { StoreLanding as ReleasedStoreLanding } from '@ilokesto/docs-runtime/store-landing';
+import { PublicationVersion } from '@/components/landings/publication-version';
+import { getDocsChannel, isDevelopmentDocs, isPackageIndex, isPackageName, scopeDevelopmentLink } from '@/lib/publication';
 
 export default async function Page(props: { params: Promise<{ lang: string; slug?: string[] }> }) {
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
 
-  const channel = getStoreDocsChannel(params.slug);
+  const name = params.slug?.[0];
+  const channel = getDocsChannel(params.slug);
+  if (!isPackageName(name) || !channel) notFound();
   const lang = params.lang === 'ko' ? 'ko' : 'en';
-  if (isStoreIndex(params.slug)) {
-    return channel === 'released' ? <PublishedStoreLanding lang={lang} /> : <StoreLanding lang={lang} />;
+  if (isPackageIndex(params.slug) && name === 'store') {
+    return channel === 'released' ? <ReleasedStoreLanding lang={lang} /> : <StoreLanding lang={lang} />;
   }
-  const landing = params.slug?.length === 1 ? getLandingPackage(params.slug[0]) : undefined;
+  const landing = isPackageIndex(params.slug) ? getLandingPackage(name) : undefined;
   if (landing) {
     return <PackageLanding info={landing} lang={params.lang === 'ko' ? 'ko' : 'en'} />;
   }
@@ -32,8 +34,8 @@ export default async function Page(props: { params: Promise<{ lang: string; slug
   const MDX = page.data.body;
   const RelativeLink = createRelativeLink(source, page);
   const relativeSlug = channel === 'next' ? page.slugs.slice(2) : page.slugs.slice(1);
-  const releasedPage = source.getPage(['store', ...relativeSlug], lang);
-  const nextPage = source.getPage(['store', 'next', ...relativeSlug], lang);
+  const releasedPage = source.getPage([name, ...relativeSlug], lang);
+  const nextPage = source.getPage([name, 'next', ...relativeSlug], lang);
 
   return (
     <DocsPage
@@ -42,14 +44,14 @@ export default async function Page(props: { params: Promise<{ lang: string; slug
       tableOfContent={{ style: 'clerk' }}
       tableOfContentPopover={{ style: 'clerk' }}
     >
-      {channel ? <StoreVersion lang={lang} channel={channel}
-        releasedHref={releasedPage?.url ?? `/${lang}/store`}
-        nextHref={nextPage?.url ?? `/${lang}/store/next`} /> : null}
+      <PublicationVersion name={name} lang={lang} channel={channel}
+        releasedHref={releasedPage?.url ?? `/${lang}/${name}`}
+        nextHref={nextPage?.url ?? `/${lang}/${name}/next`} />
       <DocsBody>
         <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths
-            a: ({ href, ...props }) => <RelativeLink {...props} href={isDevelopmentDocs(params.slug) ? scopeStoreNextLink(href) : href} />,
+            a: ({ href, ...props }) => <RelativeLink {...props} href={isDevelopmentDocs(params.slug) ? scopeDevelopmentLink(href) : href} />,
           })}
         />
       </DocsBody>

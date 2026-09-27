@@ -5,7 +5,8 @@ import {
   overlay,
   state,
   store,
-  storePublished,
+  storeReleased, stateReleased, formReleased, overlayReleased,
+  modalReleased, toastReleased, utilinentReleased, fetcherReleased,
   toast,
   utilinent,
 } from 'collections/server';
@@ -15,20 +16,22 @@ import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import type { Node, Root } from 'fumadocs-core/page-tree';
 import { i18n } from '@/lib/i18n';
 import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
-import { isDevelopmentDocs, scopeStoreNextLink, storePilotEnabled } from './store-publication';
+import { isDevelopmentDocs, scopeDevelopmentLink } from './publication';
 
 const packageCollections = {
-  store: storePilotEnabled ? storePublished : store,
-  state,
-  form,
-  overlay,
-  modal,
-  toast,
-  utilinent,
-  fetcher,
+  store: storeReleased,
+  state: stateReleased,
+  form: formReleased,
+  overlay: overlayReleased,
+  modal: modalReleased,
+  toast: toastReleased,
+  utilinent: utilinentReleased,
+  fetcher: fetcherReleased,
 };
 
-type Collection = (typeof packageCollections)[keyof typeof packageCollections];
+const developmentCollections = { store, state, form, overlay, modal, toast, utilinent, fetcher };
+type Collection = (typeof packageCollections)[keyof typeof packageCollections]
+  | (typeof developmentCollections)[keyof typeof developmentCollections];
 
 function createSource(collections: readonly (readonly [string, Collection])[]) {
   const docs = collections.flatMap(([prefix, collection]) =>
@@ -51,13 +54,9 @@ function createSource(collections: readonly (readonly [string, Collection])[]) {
   });
 }
 
-const currentCollections = Object.entries(packageCollections);
-const publicCollections = storePilotEnabled
-  ? currentCollections.filter(([name]) => name === 'store')
-  : currentCollections;
-const nextCollections: readonly (readonly [string, Collection])[] = storePilotEnabled
-  ? [...currentCollections.filter(([name]) => name !== 'store'), ['store/next', store]]
-  : [];
+const publicCollections = Object.entries(packageCollections);
+const nextCollections = Object.entries(developmentCollections)
+  .map(([name, collection]) => [`${name}/next`, collection] as const);
 
 export const publicSource = createSource(publicCollections);
 export const developmentSource = createSource(nextCollections);
@@ -191,8 +190,8 @@ export function getPageMarkdownUrl(page: InferPageType<typeof source>) {
 export async function getLLMText(page: InferPageType<typeof source>) {
   const processed = await page.data.getText('processed');
   const content = isDevelopmentDocs(page.slugs)
-    ? processed.replace(/(\]\()(\/(?:en|ko)\/store(?:\/[^\s)"'#?]*)?)/g,
-        (_match, prefix: string, href: string) => prefix + scopeStoreNextLink(href))
+    ? processed.replace(/(\]\()(\/(?:en|ko)\/[^\s)"']+)/g,
+        (_match, prefix: string, href: string) => prefix + scopeDevelopmentLink(href))
     : processed;
 
   return `# ${page.data.title} (${page.url})

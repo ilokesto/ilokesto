@@ -18,6 +18,11 @@ test('all package documentation is consumed from its canonical workspace directo
     assert.equal(collection.docs.postprocess.includeProcessedMarkdown, true);
     await access(`${repoRoot}packages/${packageName}/docs/index.mdx`);
     await access(`${repoRoot}packages/${packageName}/docs/index.ko.mdx`);
+    const released = collections[`${packageName}Released`];
+    const frozen = await realpath(`${repoRoot}docs-publication/.generated/${packageName}/docs`);
+    assert.equal(await realpath(resolve(appRoot, released.docs.dir)), frozen);
+    assert.equal(await realpath(resolve(appRoot, released.meta.dir)), frozen);
+    assert.notEqual(frozen, canonical);
   }
 
   await assert.rejects(access(`${appRoot}content/docs`));

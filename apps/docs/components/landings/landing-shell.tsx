@@ -1,22 +1,28 @@
+'use client';
+
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import type { LandingPackage } from './landing-packages';
 import styles from './store-landing.module.css';
-import { publishedStore, type StoreDocsChannel } from '@/lib/store-publication';
-import { StoreVersion } from './store-version';
+import { isDevelopmentDocs, publishedPackages } from '@/lib/publication';
+import { PublicationVersion } from './publication-version';
 
-export function LandingShell({ info, lang, children, storeChannel }: {
+export function LandingShell({ info, lang, children }: {
   readonly info: LandingPackage;
   readonly lang: 'en' | 'ko';
   readonly children: ReactNode;
-  readonly storeChannel?: StoreDocsChannel;
 }) {
   const korean = lang === 'ko';
-  const suffix = storeChannel === 'next' ? '/next' : '';
+  const pathname = usePathname();
+  const channel = isDevelopmentDocs(pathname.split('/').filter(Boolean).slice(1)) ? 'next' : 'released';
+  const release = publishedPackages[info.name];
+  const suffix = channel === 'next' ? '/next' : '';
   return (
-    <div className={styles.landing} data-landing={info.name}>
+    <div className={styles.landing} data-landing={info.name}
+      data-runtime-version={channel === 'released' ? release.version : 'workspace'}>
       <a href={`#${info.name}-demo`} className={styles.skip}>{korean ? '데모로 바로 가기' : 'Skip to demo'}</a>
       <header className={styles.header}>
         <Link href={`/${lang}`} aria-label="ilokesto" className={styles.wordmark}>ilokesto<span>/ {info.name}</span></Link>
@@ -24,10 +30,10 @@ export function LandingShell({ info, lang, children, storeChannel }: {
           <Link href={`/${lang}/${info.name}${suffix}/quick-start`}>
             {korean ? '문서 보기' : 'Documentation'}<ArrowUpRight size={15} aria-hidden />
           </Link>
-          <a href={storeChannel === 'released'
-            ? `https://www.npmjs.com/package/@ilokesto/store/v/${publishedStore.version}`
+          <a href={channel === 'released'
+            ? `https://www.npmjs.com/package/${release.name}/v/${release.version}`
             : `https://github.com/ilokesto/ilokesto/tree/main/packages/${info.name}`}>
-            {storeChannel === 'released' ? 'npm' : 'GitHub'}<ArrowUpRight size={15} aria-hidden />
+            {channel === 'released' ? 'npm' : 'GitHub'}<ArrowUpRight size={15} aria-hidden />
           </a>
           <Link href={`/${korean ? 'en' : 'ko'}/${info.name}${suffix}`} hrefLang={korean ? 'en' : 'ko'} className={styles.language}>
             {korean ? 'EN' : '한국어'}
@@ -41,7 +47,7 @@ export function LandingShell({ info, lang, children, storeChannel }: {
         <div className={styles.intro}>
           <h1>{info.title}<span>.</span></h1>
           <p className={styles.tagline}>{info[lang]}</p>
-          {storeChannel ? <StoreVersion lang={lang} channel={storeChannel} /> : null}
+          <PublicationVersion name={info.name} lang={lang} channel={channel} compact />
           {info.name === 'fetcher' ? <p className={styles.beta}>Beta</p> : null}
         </div>
         {children}

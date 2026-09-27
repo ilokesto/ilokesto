@@ -2,19 +2,17 @@
 
 import { Minus, Plus, RotateCcw } from 'lucide-react';
 import { useCallback, useSyncExternalStore } from 'react';
-import type { createPublishedStoreCounter } from '@/lib/published-store';
-import type { StoreDocsChannel } from '@/lib/store-publication';
+import type { Store } from '@ilokesto/store';
 import { landingPackages } from './landing-packages';
 import { LandingShell } from './landing-shell';
 import styles from './store-landing.module.css';
 
-type CounterStore = Pick<ReturnType<typeof createPublishedStoreCounter>,
+type CounterStore = Pick<Store<{ count: number }>,
   'subscribe' | 'getState' | 'getInitialState' | 'setState'>;
 
-export function StoreLandingView({ lang, store, channel }: {
+export function StoreLandingView({ lang, store }: {
   readonly lang: 'en' | 'ko';
   readonly store: CounterStore;
-  readonly channel?: StoreDocsChannel;
 }) {
   const subscribe = useCallback((listener: () => void) => store.subscribe(listener), [store]);
   const getSnapshot = useCallback(() => store.getState().count, [store]);
@@ -31,9 +29,9 @@ export function StoreLandingView({ lang, store, channel }: {
       };
 
   return (
-    <LandingShell info={landingPackages[0]} lang={lang} storeChannel={channel}>
+    <LandingShell info={landingPackages[0]} lang={lang}>
         <section className={styles.workspace} id="store-demo" data-demo-slot="store" data-demo="store"
-          data-store-runtime={channel === 'released' ? 'npm:1.1.2' : 'workspace'} aria-label={copy.note}>
+          aria-label={copy.note}>
           <div className={styles.counter}>
             <span className={styles.counterLabel}>{copy.label}</span>
             <output data-demo-result="store-count" aria-live="polite" className={styles.count}>{count}</output>

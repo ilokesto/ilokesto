@@ -3,7 +3,7 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { isDevelopmentDocs, storePilotEnabled } from '@/lib/store-publication';
+import { isDevelopmentDocs } from '@/lib/publication';
 
 export function DocsProvider({ lang, children }: {
   readonly lang: string;
@@ -28,13 +28,6 @@ export function DocsProvider({ lang, children }: {
           : undefined,
       }}
     >
-      {storePilotEnabled ? (
-        <aside role="note" data-store-docs-pilot="true" className="break-keep border-b border-fd-border bg-fd-muted px-6 py-2 text-xs text-fd-muted-foreground">
-          {lang === 'ko'
-            ? 'Store 1.1.2 공개 문서 시범 모드입니다. 다른 패키지는 아직 main 기준이며 운영 전환 전입니다.'
-            : 'Store 1.1.2 publication pilot. Other packages still track main; this is not a production cutover.'}
-        </aside>
-      ) : null}
       {children}
     </RootProvider>
   );
