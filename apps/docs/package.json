@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
+    "build": "node ../../scripts/store-docs-snapshot.mjs && next build",
+    "dev": "node ../../scripts/store-docs-snapshot.mjs && next dev",
     "start": "next start",
-    "typecheck": "fumadocs-mdx && next typegen && tsc --noEmit",
+    "typecheck": "node ../../scripts/store-docs-snapshot.mjs && fumadocs-mdx && next typegen && tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
-    "postinstall": "fumadocs-mdx"
+    "postinstall": "node ../../scripts/store-docs-snapshot.mjs && fumadocs-mdx"
   },
   "dependencies": {
     "@ilokesto/fetcher": "workspace:*",

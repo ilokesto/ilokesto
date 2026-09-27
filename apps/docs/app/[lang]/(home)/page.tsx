@@ -2,6 +2,7 @@ import { packageMetadata } from '@/lib/layout.shared';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { publishedStore, storePilotEnabled } from '@/lib/store-publication';
 
 import { homeCopy, packageCards, packageGroups, type Locale, type PackageCard } from './home-content';
 
@@ -12,9 +13,11 @@ function getLocale(lang: string): Locale {
 function PackageCard({ lang, locale, card }: { lang: string; locale: Locale; card: PackageCard }) {
   const { pkg } = card;
   const copy = homeCopy[locale];
+  const releasedStore = storePilotEnabled && pkg === 'store';
 
   return (
-    <article className="flex h-full flex-col rounded-sm border border-fd-border bg-fd-background/80 p-5 transition-colors hover:bg-fd-accent/50">
+    <article data-docs-channel={storePilotEnabled ? (releasedStore ? 'released' : 'next') : undefined}
+      className="flex h-full flex-col rounded-sm border border-fd-border bg-fd-background/80 p-5 transition-colors hover:bg-fd-accent/50">
       <span
         className={`mb-5 h-1.5 w-10 ${packageMetadata[pkg].colorClass}`}
         aria-hidden="true"
@@ -27,8 +30,13 @@ function PackageCard({ lang, locale, card }: { lang: string; locale: Locale; car
           @ilokesto/{pkg}
         </Link>
       </h4>
+      {storePilotEnabled ? <p className="mt-2 font-mono text-xs text-fd-muted-foreground">
+        {releasedStore ? `v${publishedStore.version}` : 'main · next'}
+      </p> : null}
       <p className="mt-2 flex-1 text-sm leading-6 text-fd-muted-foreground break-keep">
-        {card.descriptions[locale]}
+        {releasedStore
+          ? (locale === 'ko' ? '상태를 저장·갱신하고 변경을 구독하는 프레임워크 독립 코어.' : 'Framework-neutral state storage, updates, and change subscriptions.')
+          : card.descriptions[locale]}
       </p>
       <p className="mt-4 text-xs leading-5 text-fd-muted-foreground">
         <span className="font-semibold text-fd-foreground">{copy.support}:</span>{' '}

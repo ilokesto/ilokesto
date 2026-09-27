@@ -10,14 +10,19 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { StoreLanding } from '@/components/landings/store-landing';
 import { PackageLanding } from '@/components/landings/package-landing';
 import { getLandingPackage } from '@/components/landings/landing-packages';
+import { PublishedStoreLanding } from '@/components/landings/published-store-landing';
+import { StoreVersion } from '@/components/landings/store-version';
+import { getStoreDocsChannel, isDevelopmentDocs, isStoreIndex, scopeStoreNextLink } from '@/lib/store-publication';
 
 export default async function Page(props: { params: Promise<{ lang: string; slug?: string[] }> }) {
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
 
-  if (params.slug?.length === 1 && params.slug[0] === 'store') {
-    return <StoreLanding lang={params.lang === 'ko' ? 'ko' : 'en'} />;
+  const channel = getStoreDocsChannel(params.slug);
+  const lang = params.lang === 'ko' ? 'ko' : 'en';
+  if (isStoreIndex(params.slug)) {
+    return channel === 'released' ? <PublishedStoreLanding lang={lang} /> : <StoreLanding lang={lang} />;
   }
   const landing = params.slug?.length === 1 ? getLandingPackage(params.slug[0]) : undefined;
   if (landing) {
@@ -25,6 +30,10 @@ export default async function Page(props: { params: Promise<{ lang: string; slug
   }
 
   const MDX = page.data.body;
+  const RelativeLink = createRelativeLink(source, page);
+  const relativeSlug = channel === 'next' ? page.slugs.slice(2) : page.slugs.slice(1);
+  const releasedPage = source.getPage(['store', ...relativeSlug], lang);
+  const nextPage = source.getPage(['store', 'next', ...relativeSlug], lang);
 
   return (
     <DocsPage
@@ -33,11 +42,14 @@ export default async function Page(props: { params: Promise<{ lang: string; slug
       tableOfContent={{ style: 'clerk' }}
       tableOfContentPopover={{ style: 'clerk' }}
     >
+      {channel ? <StoreVersion lang={lang} channel={channel}
+        releasedHref={releasedPage?.url ?? `/${lang}/store`}
+        nextHref={nextPage?.url ?? `/${lang}/store/next`} /> : null}
       <DocsBody>
         <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths
-            a: createRelativeLink(source, page),
+            a: ({ href, ...props }) => <RelativeLink {...props} href={isDevelopmentDocs(params.slug) ? scopeStoreNextLink(href) : href} />,
           })}
         />
       </DocsBody>
@@ -57,6 +69,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string; 
   return {
     title: page.data.title,
     description: page.data.description,
+    robots: isDevelopmentDocs(params.slug) ? { index: false, follow: false } : undefined,
     openGraph: {
       images: getPageImage(page).url,
     },

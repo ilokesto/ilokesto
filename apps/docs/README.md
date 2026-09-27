@@ -50,6 +50,52 @@ no copied or generated package-content directory to edit or synchronize.
 
 ## Verification
 
+### Opt-in Store publication pilot
+
+The ordinary commands retain the existing main-tracking site. The pilot freezes
+only Store at the verified npm `1.1.2` artifact:
+
+```sh
+pnpm docs:build:store-pilot
+pnpm docs:test:store-pilot
+pnpm docs:start
+```
+
+Store 1.1.2 was current at pilot startup. A concurrent npm publication has since
+moved Store to 2.0.0. The timestamped registry inventory is refreshed separately;
+the older pilot remains fixed to prove isolation. The first production rollout
+must use the then-current verified inventory, not promote this pilot unchanged.
+
+Or run `pnpm docs:dev:store-pilot` while editing. The
+`NEXT_PUBLIC_STORE_DOCS_PILOT=1` switch is compiled into the pilot build; the
+server does not need it at startup. Normal and pilot builds share `.next`, so
+stop an existing server before rebuilding and always pair a build with its
+matching test command. Run `pnpm docs:build` to restore the ordinary build.
+
+In pilot mode:
+
+- `/en/store` and `/ko/store` use the frozen runtime and release READMEs.
+- `/en/store/next` and `/ko/store/next` track current workspace docs/runtime.
+- The matching `quick-start` pages expose the two sources separately.
+- Default search and LLM exports contain only the verified Store corpus.
+  `/api/search/next` and `/llms-next.txt` expose development sources.
+- Explicit next Markdown/OG routes remain available and carry `noindex`;
+  development HTML also carries robots metadata.
+- Other packages still track main and are identified as development content.
+
+The original README bytes and runtime are under `docs-publication/snapshots`.
+The verifier runs before docs install/build/dev/typecheck, rejects modified or
+mismatched inputs, and generates renderer files outside the app. No current
+Store guides are backfilled into the `1.1.2` snapshot. See
+[`docs-publication/README.md`](../../docs-publication/README.md) and
+[`DECISIONS/006-release-aligned-docs-pilot.md`](../../DECISIONS/006-release-aligned-docs-pilot.md).
+
+This is not a production cutover. Do not enable the pilot switch in production;
+current-baseline snapshots (including Store 2.0.0), complete dependency closures,
+and documentation promotion automation are not implemented.
+
+### Ordinary site checks
+
 ```sh
 pnpm docs:build
 pnpm docs:typecheck

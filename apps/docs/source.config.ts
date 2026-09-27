@@ -16,6 +16,7 @@ const packageDocs = (dir: string) =>
   });
 
 export const store = packageDocs('../../packages/store/docs');
+export const storePublished = packageDocs('../../docs-publication/.generated/store-1.1.2');
 export const state = packageDocs('../../packages/state/docs');
 export const form = packageDocs('../../packages/form/docs');
 export const overlay = packageDocs('../../packages/overlay/docs');

@@ -3,6 +3,7 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions, getPackageTabs, packageMetadata } from '@/lib/layout.shared';
 import { ReactNode } from 'react';
 import { getLandingPackage } from '@/components/landings/landing-packages';
+import { isDevelopmentDocs, isStoreIndex } from '@/lib/store-publication';
 
 export default async function Layout({
   children,
@@ -12,7 +13,7 @@ export default async function Layout({
   params: Promise<{ lang: string; slug?: string[] }>;
 }) {
   const resolvedParams = await params;
-  if (resolvedParams.slug?.length === 1 && getLandingPackage(resolvedParams.slug[0])) {
+  if (isStoreIndex(resolvedParams.slug) || (resolvedParams.slug?.length === 1 && getLandingPackage(resolvedParams.slug[0]))) {
     return children;
   }
   const pkgName = resolvedParams.slug?.[0] || 'store';
@@ -31,7 +32,7 @@ export default async function Layout({
         }
       `}</style>
       <DocsLayout
-        tree={getDocsPageTree(resolvedParams.lang)}
+        tree={getDocsPageTree(resolvedParams.lang, isDevelopmentDocs(resolvedParams.slug))}
         tabs={getPackageTabs(resolvedParams.lang)}
         {...baseOptions()}
       >

@@ -10,6 +10,7 @@ import { demoBehaviors } from './demo-behaviors.mjs';
 const require = createRequire(import.meta.url);
 const appRoot = fileURLToPath(new URL('../', import.meta.url));
 const packages = ['store', 'state', 'form', 'overlay', 'modal', 'toast', 'utilinent', 'fetcher'];
+const storePilot = process.env.NEXT_PUBLIC_STORE_DOCS_PILOT === '1';
 let server;
 let origin;
 let browser;
@@ -79,6 +80,9 @@ for (const lang of ['en', 'ko']) {
         await expect(page.locator(`[data-landing="${packageName}"]`)).toBeVisible();
         await expect(page.locator('#nd-sidebar')).toHaveCount(0);
         await expect(page.locator(`[data-demo="${packageName}"]`)).toBeVisible();
+        if (packageName === 'store') {
+          await expect(page.locator('[data-store-runtime]')).toHaveAttribute('data-store-runtime', storePilot ? 'npm:1.1.2' : 'workspace');
+        }
         await demoBehaviors[packageName](page);
         assert.deepEqual(errors, []);
       } finally {
@@ -152,8 +156,12 @@ test('every canonical bilingual page is served from the production build', { tim
     for (const file of files.filter((file) => file.endsWith('.mdx'))) {
       const lang = file.endsWith('.ko.mdx') ? 'ko' : 'en';
       const slug = file.replace(/(?:\.ko)?\.mdx$/, '').replace(/(^|\/)index$/, '');
-      routes.push(`/${lang}/${name}/${slug}`.replace(/\/$/, ''));
+      const prefix = storePilot && name === 'store' ? 'store/next' : name;
+      routes.push(`/${lang}/${prefix}/${slug}`.replace(/\/$/, ''));
     }
+  }
+  if (storePilot) {
+    for (const lang of ['en', 'ko']) routes.push(`/${lang}/store`, `/${lang}/store/quick-start`);
   }
   for (let offset = 0; offset < routes.length; offset += 12) {
     await Promise.all(routes.slice(offset, offset + 12).map(async (route) => {
@@ -170,7 +178,7 @@ test('every canonical bilingual page is served from the production build', { tim
   }
 });
 
-test('home navigation and search expose every package in both languages', async () => {
+test('home navigation preserves packages and search stays localized', async () => {
   for (const lang of ['en', 'ko']) {
     const home = await (await request(`/${lang}`)).text();
     for (const name of packages) {
@@ -189,6 +197,76 @@ test('home navigation and search expose every package in both languages', async 
     assert.ok(results.every((result) => result.url.startsWith(`/${lang}/`)));
   }
 });
+
+if (storePilot) {
+  test('published Store discovery excludes development documentation', async () => {
+    for (const lang of ['en', 'ko']) {
+      const released = await (await request(`/api/search?query=store&locale=${lang}`)).json();
+      assert.ok(released.length > 0);
+      assert.ok(released.every(result => result.url.startsWith(`/${lang}/store`) && !result.url.startsWith(`/${lang}/store/next`)));
+      const development = await (await request(`/api/search/next?query=createStore&locale=${lang}`)).json();
+      assert.ok(development.some(result => result.url.startsWith(`/${lang}/store/next`)));
+      assert.equal((await request(`/${lang}/store/advanced/notification-semantics`)).status, 404);
+      const nextMarkdown = await request(`/llms.mdx/docs/${lang}/store/next/quick-start/content.md`);
+      assert.equal(nextMarkdown.status, 200);
+      assert.equal(nextMarkdown.headers.get('x-robots-tag'), 'noindex');
+      const nextImage = await request(`/og/docs/${lang}/store/next/image.webp`);
+      assert.equal(nextImage.status, 200);
+      assert.equal(nextImage.headers.get('x-robots-tag'), 'noindex');
+    }
+    const publicIndex = await (await request('/llms.txt')).text();
+    const publicText = await (await request('/llms-full.txt')).text();
+    assert.doesNotMatch(publicIndex + publicText, /\/(?:en|ko)\/store\/next/);
+    assert.doesNotMatch(publicIndex, /\/(?:en|ko)\/(?:state|form|overlay|modal|toast|fetcher|utilinent)/);
+    const nextText = await request('/llms-next.txt');
+    assert.equal(nextText.headers.get('x-robots-tag'), 'noindex');
+    assert.match(await nextText.text(), /\/en\/store\/next/);
+  });
+
+  for (const lang of ['en', 'ko']) {
+    test(`${lang} Store switches runtime and search scope with its documentation channel`, { timeout: 30_000 }, async () => {
+      const page = await browser.newPage();
+      try {
+        await page.goto(`${origin}/${lang}/store`);
+        await expect(page.locator('[data-docs-version]')).toHaveAttribute('data-docs-version', '1.1.2');
+        await Promise.all([
+          page.waitForURL(`${origin}/${lang}/store/next`),
+          page.locator('[data-doc-channel-link="next"]').click(),
+        ]);
+        await expect(page.locator('[data-store-runtime]')).toHaveAttribute('data-store-runtime', 'workspace');
+        await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+        await demoBehaviors.store(page);
+        const other = lang === 'en' ? 'ko' : 'en';
+        await Promise.all([
+          page.waitForURL(`${origin}/${other}/store/next`),
+          page.locator(`header a[hreflang="${other}"]`).click(),
+        ]);
+        await Promise.all([
+          page.waitForURL(`${origin}/${other}/store/next/quick-start`),
+          page.locator(`header a[href="/${other}/store/next/quick-start"]`).click(),
+        ]);
+        const nextSearch = page.waitForRequest(req => new URL(req.url()).pathname === '/api/search/next');
+        await page.keyboard.press('ControlOrMeta+k');
+        await page.getByRole('dialog').getByRole('textbox').fill('createStore');
+        await nextSearch;
+        await page.keyboard.press('Escape');
+        await Promise.all([
+          page.waitForURL(`${origin}/${other}/store/quick-start`),
+          page.locator('[data-doc-channel-link="released"]').click(),
+        ]);
+        await expect(page.locator('[data-docs-version]')).toHaveAttribute('data-docs-version', '1.1.2');
+      } finally {
+        await page.close();
+      }
+    });
+  }
+} else {
+  test('the publication pilot is not exposed by a normal build', async () => {
+    for (const path of ['/en/store/next', '/api/search/next', '/llms-next.txt']) {
+      assert.equal((await request(path)).status, 404, path);
+    }
+  });
+}
 
 test('Markdown and image handlers preserve the requested locale without redirects', async () => {
   for (const lang of ['en', 'ko']) {

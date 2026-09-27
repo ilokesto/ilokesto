@@ -54,6 +54,15 @@ approval of the prototype.
 
 ## Existing system
 
+### Store publication pilot
+
+- The opt-in Store pilot adds compact version links using existing typography,
+  neutral borders and 44px link targets; it does not redesign the illustrations.
+- Released pages show the exact npm version. Next pages show a clear
+  unpublished-content notice and preserve the version when switching language.
+- A pilot notice explains that only Store is frozen; other packages still use
+  development sources. Normal builds do not show this pilot UI.
+
 Use the existing Fumadocs neutral theme, Tailwind utilities, package color
 metadata, and ilokesto logo. The site supports light and dark themes. Do not
 introduce a second theme or font system.
