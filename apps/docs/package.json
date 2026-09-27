@@ -12,6 +12,14 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
+    "@ilokesto/fetcher": "workspace:*",
+    "@ilokesto/form": "workspace:*",
+    "@ilokesto/modal": "workspace:*",
+    "@ilokesto/overlay": "workspace:*",
+    "@ilokesto/state": "workspace:*",
+    "@ilokesto/store": "workspace:*",
+    "@ilokesto/toast": "workspace:*",
+    "@ilokesto/utilinent": "workspace:*",
     "@takumi-rs/image-response": "^0.73.1",
     "flexsearch": "^0.8.212",
     "fumadocs-core": "16.7.6",
@@ -24,6 +32,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.5.0",

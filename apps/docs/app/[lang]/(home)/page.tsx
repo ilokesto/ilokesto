@@ -30,6 +30,15 @@ function PackageCard({ lang, locale, card }: { lang: string; locale: Locale; car
       <p className="mt-2 flex-1 text-sm leading-6 text-fd-muted-foreground break-keep">
         {card.descriptions[locale]}
       </p>
+      <p className="mt-4 text-xs leading-5 text-fd-muted-foreground">
+        <span className="font-semibold text-fd-foreground">{copy.support}:</span>{' '}
+        {card.support[locale]}
+        {card.beta ? (
+          <span className="ml-2 inline-flex rounded-full border border-fd-border px-2 py-0.5 font-semibold text-fd-primary">
+            {copy.beta}
+          </span>
+        ) : null}
+      </p>
       <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t border-fd-border pt-4 text-xs font-medium">
         <Link
           href={`/${lang}/${pkg}`}
@@ -37,12 +46,12 @@ function PackageCard({ lang, locale, card }: { lang: string; locale: Locale; car
         >
           {copy.packageIntroduction}
         </Link>
-          <Link
-            href={`/${lang}/${pkg}/quick-start`}
-            className="rounded-sm text-fd-muted-foreground underline-offset-4 hover:text-fd-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
-          >
-            {copy.packageQuickStart}
-          </Link>
+        <Link
+          href={`/${lang}/${pkg}/quick-start`}
+          className="rounded-sm text-fd-muted-foreground underline-offset-4 hover:text-fd-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+        >
+          {copy.packageQuickStart}
+        </Link>
       </div>
     </article>
   );
@@ -92,40 +101,90 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 {copy.browse}
                 <ArrowRight className="size-4" aria-hidden="true" />
               </a>
-              <Link
-                href={`/${lang}/store`}
-                className="inline-flex min-h-11 items-center rounded-full border border-fd-border bg-fd-background/80 px-5 py-2.5 text-sm font-semibold outline-none transition-colors hover:bg-fd-accent focus-visible:ring-2 focus-visible:ring-fd-ring"
-              >
-                {copy.introduction}
-              </Link>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-3xl border border-fd-border bg-fd-card shadow-xl shadow-black/5">
-            <div className="border-b border-fd-border px-5 py-5 sm:px-6">
+          <aside
+            className="rounded-3xl border border-fd-border bg-fd-card p-5 shadow-xl shadow-black/5 sm:p-6"
+            aria-labelledby="ecosystem-title"
+          >
+            <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-fd-primary">
-                {copy.exampleLabel}
+                {copy.relationshipEyebrow}
               </p>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight break-keep">{copy.exampleTitle}</h2>
-              <p className="mt-2 text-sm leading-6 text-fd-muted-foreground break-keep">{copy.exampleBody}</p>
-            </div>
-            <div className="overflow-x-auto bg-neutral-950 p-5 text-[13px] leading-6 text-neutral-200 sm:p-6">
-              <pre><code><span className="text-fuchsia-300">import</span>{' { Store } '}<span className="text-fuchsia-300">from</span>{' '}<span className="text-emerald-300">'@ilokesto/store'</span>{';\n\n'}<span className="text-fuchsia-300">const</span>{' counter = '}<span className="text-fuchsia-300">new</span>{' Store({ count: '}<span className="text-amber-300">0</span>{' });\n\ncounter.subscribe(() => {\n  console.log(counter.getState().count);\n});\n\ncounter.setState(({ count }) => ({\n  count: count + '}<span className="text-amber-300">1</span>{',\n}));'}</code></pre>
-            </div>
-            <div className="flex flex-col gap-4 border-t border-fd-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              <p className="font-mono text-sm">
-                <span className="mr-3 font-sans text-xs font-medium text-fd-muted-foreground">{copy.result}</span>
-                <span aria-hidden="true" className="text-fd-muted-foreground">› </span>1
+              <h2 id="ecosystem-title" className="mt-2 text-xl font-semibold tracking-tight break-keep">
+                {copy.relationshipTitle}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-fd-muted-foreground break-keep">
+                {copy.relationshipBody}
               </p>
-              <Link
-                href={`/${lang}/store/quick-start`}
-                className="inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
-              >
-                {copy.quickStart}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
             </div>
-          </div>
+            <ol className="mt-6 space-y-3 text-sm">
+              <li className="rounded-2xl border border-fd-border bg-fd-background/80 p-4">
+                <p className="text-xs font-medium text-fd-muted-foreground">{copy.foundation}</p>
+                <Link
+                  href={`/${lang}/store`}
+                  className="mt-1 inline-block rounded-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                >
+                  Store
+                </Link>
+              </li>
+              <li className="ml-4 border-l border-fd-border pl-4 sm:ml-6 sm:pl-5">
+                <p className="mb-2 text-xs font-medium text-fd-muted-foreground">{copy.builtOnStore}</p>
+                <ul className="grid gap-2 sm:grid-cols-3">
+                  {(['state', 'form', 'overlay'] as const).map((pkg) => (
+                    <li key={pkg} className="rounded-xl border border-fd-border bg-fd-background/80 px-3 py-2.5">
+                      <Link
+                        href={`/${lang}/${pkg}`}
+                        className="rounded-sm font-semibold capitalize underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                      >
+                        {pkg}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-3 ml-4 border-l border-fd-border pl-4">
+                  <p className="mb-2 text-xs font-medium text-fd-muted-foreground">{copy.builtOnOverlay}</p>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {(['modal', 'toast'] as const).map((pkg) => (
+                      <li key={pkg} className="rounded-xl border border-fd-border bg-fd-background/80 px-3 py-2.5">
+                        <Link
+                          href={`/${lang}/${pkg}`}
+                          className="rounded-sm font-semibold capitalize underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                        >
+                          {pkg}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+              <li className="border-t border-fd-border pt-3">
+                <p className="mb-2 text-xs font-medium text-fd-muted-foreground">{copy.standalone}</p>
+                <ul className="grid grid-cols-2 gap-2">
+                  <li className="rounded-xl border border-fd-border bg-fd-background/80 px-3 py-2.5">
+                    <Link
+                      href={`/${lang}/utilinent`}
+                      className="rounded-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                    >
+                      Utilinent
+                    </Link>
+                  </li>
+                  <li className="rounded-xl border border-fd-border bg-fd-background/80 px-3 py-2.5">
+                    <Link
+                      href={`/${lang}/fetcher`}
+                      className="rounded-sm font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+                    >
+                      Fetcher
+                    </Link>
+                    <span className="ml-2 rounded-full border border-fd-border px-1.5 py-0.5 text-[10px] font-semibold text-fd-primary">
+                      {copy.beta}
+                    </span>
+                  </li>
+                </ul>
+              </li>
+            </ol>
+          </aside>
         </div>
       </section>
 

@@ -14,6 +14,8 @@ export type PackageName =
 export type PackageCard = {
   readonly pkg: PackageName;
   readonly descriptions: Record<Locale, string>;
+  readonly support: Record<Locale, string>;
+  readonly beta?: boolean;
 };
 
 export const packageCards: readonly PackageCard[] = [
@@ -23,12 +25,17 @@ export const packageCards: readonly PackageCard[] = [
       en: 'A small framework-neutral state container with synchronous reads and selector subscriptions.',
       ko: '동기식 읽기와 선택 구독을 제공하는 작은 프레임워크 독립 상태 컨테이너.',
     },
+    support: { en: 'Framework-neutral', ko: '프레임워크 독립' },
   },
   {
     pkg: 'state',
     descriptions: {
       en: 'Framework adapters, reducers, middleware, and utilities built on the same store model.',
       ko: '같은 상태 모델에 프레임워크 어댑터, 리듀서, 미들웨어와 유틸리티를 더합니다.',
+    },
+    support: {
+      en: 'Vanilla · React · Vue · Angular · Svelte · Solid',
+      ko: 'Vanilla · React · Vue · Angular · Svelte · Solid',
     },
   },
   {
@@ -37,6 +44,10 @@ export const packageCards: readonly PackageCard[] = [
       en: 'Headless form state, validation flow, field metadata, and bindings for four UI frameworks.',
       ko: '화면 구성은 자유롭게, 폼 상태와 검증은 일관되게. 네 가지 UI 프레임워크를 지원합니다.',
     },
+    support: {
+      en: 'Vanilla · React · Vue · Svelte · Solid',
+      ko: 'Vanilla · React · Vue · Svelte · Solid',
+    },
   },
   {
     pkg: 'overlay',
@@ -44,6 +55,7 @@ export const packageCards: readonly PackageCard[] = [
       en: 'A provider-scoped React runtime for custom modals, toasts, sheets, and layered UI.',
       ko: '모달, 토스트, 시트 등 화면 위에 겹쳐 띄우는 UI를 위한 React 런타임.',
     },
+    support: { en: 'React', ko: 'React' },
   },
   {
     pkg: 'modal',
@@ -51,6 +63,7 @@ export const packageCards: readonly PackageCard[] = [
       en: 'A pre-built modal system using Overlay’s shared lifecycle and adapter model.',
       ko: 'Overlay의 공통 수명 주기와 어댑터 모델을 사용하는 모달 시스템.',
     },
+    support: { en: 'React', ko: 'React' },
   },
   {
     pkg: 'toast',
@@ -58,6 +71,7 @@ export const packageCards: readonly PackageCard[] = [
       en: 'Toast notifications with motion, positioning, and auto-dismiss semantics.',
       ko: '애니메이션, 위치 지정과 자동 닫기를 지원하는 토스트 알림.',
     },
+    support: { en: 'React', ko: 'React' },
   },
   {
     pkg: 'utilinent',
@@ -65,6 +79,7 @@ export const packageCards: readonly PackageCard[] = [
       en: 'Composable React utilities for conditionals, lists, async states, slots, and lazy UI.',
       ko: '조건부 렌더링, 목록, 비동기 상태, 슬롯과 지연 로딩을 위한 React 유틸리티.',
     },
+    support: { en: 'React', ko: 'React' },
   },
   {
     pkg: 'fetcher',
@@ -72,6 +87,8 @@ export const packageCards: readonly PackageCard[] = [
       en: 'An OpenAPI-aware ky wrapper with typed routes, inferred responses, and errors as results. Available in beta.',
       ko: '경로 타입 검사와 응답 추론, 오류를 결과로 다루는 API를 더한 ky 래퍼. 베타 버전으로 제공됩니다.',
     },
+    support: { en: 'Framework-neutral', ko: '프레임워크 독립' },
+    beta: true,
   },
 ];
 
@@ -88,13 +105,16 @@ export const homeCopy = {
     subtitle:
       'ilokesto means “toolbox” in Esperanto. Choose only the state, forms, layered UI, rendering, or HTTP tools your product needs.',
     browse: 'Choose a package',
-    introduction: 'Read the introduction',
-    exampleLabel: 'A complete store loop',
-    exampleTitle: 'A small API with visible behavior.',
-    exampleBody:
-      'Create one value, subscribe to changes, and replace it explicitly. The result is immediate and unsurprising.',
-    result: 'Result',
-    quickStart: 'Open quick start',
+    relationshipEyebrow: 'Ecosystem map',
+    relationshipTitle: 'One foundation, focused layers.',
+    relationshipBody:
+      'Follow the dependency path when packages work together, or use a standalone tool on its own.',
+    foundation: 'Framework-neutral foundation',
+    builtOnStore: 'Built on Store',
+    builtOnOverlay: 'Built on Overlay',
+    standalone: 'Standalone packages',
+    beta: 'Beta',
+    support: 'Support',
     packagesEyebrow: 'The toolbox',
     packagesTitle: 'Start with what you are building.',
     packagesBody:
@@ -109,8 +129,9 @@ export const homeCopy = {
         description: 'Build a custom overlay runtime or choose a focused modal or toast system.',
       },
       utilities: {
-        title: 'Rendering and data',
-        description: 'Clarify React rendering branches or add OpenAPI types to ky requests.',
+        title: 'Standalone rendering and data',
+        description:
+          'Choose React rendering utilities or an OpenAPI-aware ky client without adding another ilokesto package.',
       },
     },
     packageIntroduction: 'Introduction',
@@ -136,13 +157,16 @@ export const homeCopy = {
     subtitle:
       "ilokesto는 에스페란토로 '도구상자'라는 뜻입니다. 제품에 필요한 상태 관리, 폼, 오버레이, 렌더링, HTTP 도구만 선택할 수 있습니다.",
     browse: '패키지 선택하기',
-    introduction: '소개 읽기',
-    exampleLabel: '상태 생성부터 업데이트까지',
-    exampleTitle: '작은 API, 눈에 보이는 동작.',
-    exampleBody:
-      '하나의 값을 만들고, 변경을 구독하고, 다음 값으로 명시적으로 교체합니다. 결과는 즉시 확인할 수 있습니다.',
-    result: '실행 결과',
-    quickStart: '빠른 시작 열기',
+    relationshipEyebrow: '생태계 구성',
+    relationshipTitle: '하나의 기반 위에 필요한 계층만.',
+    relationshipBody:
+      '함께 사용하는 패키지는 의존 관계를 따라 살펴보고, 독립 패키지는 필요한 곳에 바로 사용하세요.',
+    foundation: '프레임워크 독립 기반',
+    builtOnStore: 'Store 기반',
+    builtOnOverlay: 'Overlay 기반',
+    standalone: '독립 패키지',
+    beta: '베타',
+    support: '지원 환경',
     packagesEyebrow: '도구상자 살펴보기',
     packagesTitle: '지금 만들고 있는 것에서 시작하세요.',
     packagesBody:
@@ -157,9 +181,10 @@ export const homeCopy = {
         description: '나만의 오버레이를 만들거나 모달과 토스트 전용 패키지를 선택합니다.',
       },
       utilities: {
-        title: '렌더링과 데이터',
-        description: 'React 렌더링 분기를 명확히 하거나 ky 요청에 OpenAPI 타입을 더합니다.',
-      },
+        title: '독립 렌더링과 데이터 도구',
+        description:
+          '다른 ilokesto 패키지 없이 React 렌더링 유틸리티나 OpenAPI를 지원하는 ky 클라이언트를 선택합니다.',
+      }
     },
     packageIntroduction: '소개',
     packageQuickStart: '빠른 시작',

@@ -8,10 +8,13 @@ introduce a second theme or font system.
 
 ## Reader journey
 
-Home explains the toolbox, demonstrates a small real API, groups all eight
-packages by user task, and explains the two adjacent package choices.
+Home explains the whole toolbox, groups all eight packages by user task,
+shows how the packages relate, and explains the two adjacent package choices.
 Each package exposes separate introduction and quick-start links.
-Package documentation remains package-first.
+Package indexes are the hands-on entry point: each offers a working example
+using that package, its corresponding code, and onward documentation links.
+Package documentation remains package-first; the overall homepage does not
+privilege one package with its own interactive or static API tutorial.
 
 ## Tokens and typography
 
@@ -36,6 +39,26 @@ Package documentation remains package-first.
 - Section spacing uses the Tailwind 16/20/24 scale. Rounded surfaces use the
   existing 2xl/3xl scale.
 - The document owns vertical scrolling; code blocks own horizontal overflow.
+
+## Interactive package examples
+
+- Reuse a shared `DemoFrame`: localized title/instructions, live controls and
+  result, then the code for that interaction. At wide article widths these
+  areas may sit side by side; mobile uses one column.
+- Use the existing Fumadocs tokens and package accent, not stock photographs or
+  a new brand. Numeric examples use tabular figures and a clear result area.
+- Controls have at least 44px target height, visible focus rings, disabled
+  states, and associated input labels. Announce results with an appropriate
+  live region; validation errors are attached to their fields.
+- Every example is resettable or reversible, scoped to its mounted instance,
+  and cleans up subscriptions, requests, overlays, and timers on unmount.
+- Actual package APIs drive the interaction. Code shown beside an example must
+  describe the same operation; presentation-only markup may be omitted.
+- HTTP examples use a same-origin demonstration endpoint with deterministic
+  success/error responses, clearly labeled as demo data. No external account,
+  third-party availability, or real user data is required.
+- Load package demo code only where needed. Static documentation and the
+  ecosystem overview must not eagerly execute all eight packages.
 
 ## Interaction and accessibility
 
