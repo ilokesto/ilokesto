@@ -2,6 +2,7 @@ import { getDocsPageTree } from '@/lib/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions, getPackageTabs, packageMetadata } from '@/lib/layout.shared';
 import { ReactNode } from 'react';
+import { getLandingPackage } from '@/components/landings/landing-packages';
 
 export default async function Layout({
   children,
@@ -11,6 +12,9 @@ export default async function Layout({
   params: Promise<{ lang: string; slug?: string[] }>;
 }) {
   const resolvedParams = await params;
+  if (resolvedParams.slug?.length === 1 && getLandingPackage(resolvedParams.slug[0])) {
+    return children;
+  }
   const pkgName = resolvedParams.slug?.[0] || 'store';
   const metadata = packageMetadata[pkgName] || packageMetadata.store;
 

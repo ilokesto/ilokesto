@@ -105,14 +105,6 @@ export const homeCopy = {
     subtitle:
       'ilokesto means “toolbox” in Esperanto. Choose only the state, forms, layered UI, rendering, or HTTP tools your product needs.',
     browse: 'Choose a package',
-    relationshipEyebrow: 'Ecosystem map',
-    relationshipTitle: 'One foundation, focused layers.',
-    relationshipBody:
-      'Follow the dependency path when packages work together, or use a standalone tool on its own.',
-    foundation: 'Framework-neutral foundation',
-    builtOnStore: 'Built on Store',
-    builtOnOverlay: 'Built on Overlay',
-    standalone: 'Standalone packages',
     beta: 'Beta',
     support: 'Support',
     packagesEyebrow: 'The toolbox',
@@ -134,7 +126,7 @@ export const homeCopy = {
           'Choose React rendering utilities or an OpenAPI-aware ky client without adding another ilokesto package.',
       },
     },
-    packageIntroduction: 'Introduction',
+    packageExplore: 'Explore package',
     packageQuickStart: 'Quick start',
     chooseEyebrow: 'Two useful distinctions',
     chooseTitle: 'Choose the right level of abstraction.',
@@ -157,14 +149,6 @@ export const homeCopy = {
     subtitle:
       "ilokesto는 에스페란토로 '도구상자'라는 뜻입니다. 제품에 필요한 상태 관리, 폼, 오버레이, 렌더링, HTTP 도구만 선택할 수 있습니다.",
     browse: '패키지 선택하기',
-    relationshipEyebrow: '생태계 구성',
-    relationshipTitle: '하나의 기반 위에 필요한 계층만.',
-    relationshipBody:
-      '함께 사용하는 패키지는 의존 관계를 따라 살펴보고, 독립 패키지는 필요한 곳에 바로 사용하세요.',
-    foundation: '프레임워크 독립 기반',
-    builtOnStore: 'Store 기반',
-    builtOnOverlay: 'Overlay 기반',
-    standalone: '독립 패키지',
     beta: '베타',
     support: '지원 환경',
     packagesEyebrow: '도구상자 살펴보기',
@@ -186,7 +170,7 @@ export const homeCopy = {
           '다른 ilokesto 패키지 없이 React 렌더링 유틸리티나 OpenAPI를 지원하는 ky 클라이언트를 선택합니다.',
       }
     },
-    packageIntroduction: '소개',
+    packageExplore: '패키지 살펴보기',
     packageQuickStart: '빠른 시작',
     chooseEyebrow: '헷갈리기 쉬운 두 가지',
     chooseTitle: '필요한 추상화 수준을 선택하세요.',

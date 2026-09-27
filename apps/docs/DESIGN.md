@@ -1,5 +1,57 @@
 # Documentation design
 
+## Illustrated package landings
+
+The user rejected the previous article-with-demo-box layout and approved an
+illustration-led direction referencing Zustand's landing page. This section
+supersedes the shared article-frame rules for all eight package indexes.
+After the Store proposal, the user directed continuation on best judgment when
+the visual-feedback question timed out. This is not a claim of explicit visual
+approval of the prototype.
+
+- Reference: Zustand's illustrated full-screen scene, compact code panel with
+  an overlapping live counter, minimal navigation, separate documentation.
+- Original artwork: factory workers using tools and maintaining machinery.
+  Use realistic adult proportions, worn workwear, steel, patina, and textured
+  industrial illustration. No animal mascots, cute character proportions,
+  storybook scenery, text, logos, or slogans inside the artwork.
+- The user clarified that the feedback concerns illustration, not status copy,
+  and then explicitly requested a consistent, less rounded theme on the overall
+  homepage too. Preserve wording, layout and behavior; align surface colors,
+  corners and shadows across the homepage and package landings. The emotional
+  description is an art-direction constraint, never a catchphrase.
+- Composition: a single illustrated stage, not stacked feature cards. Large
+  package title at upper left, character on the left, code on the right, and
+  live controls crossing the code panel's top edge. Richer controls flow in
+  document order so validation/results cannot obscure code.
+- On small screens: title, character, overlapping counter, then code in
+  reading order. The document scrolls; the code block alone can scroll
+  horizontally. The artwork remains a substantial part of the first screen.
+- Navigation: ilokesto home, documentation/quick-start, GitHub, and the other
+  language. No documentation sidebar or table of contents on this index.
+- Shared palette: concrete `#efeee8`, graphite `#272d2a`, muted ink `#62675e`,
+  code surface `#202622`, code ink `#edf0e8`, ochre `#ead7a2`,
+  code comment `#b2b8a9`, syntax string `#ead7a2`, keyword `#dfb682`.
+  Overview dark mode uses `#242823` surfaces and `#efede5` text. Illustrated
+  scenes keep their fixed light treatment; detailed docs retain their theme.
+- Typography: existing application sans and monospace fonts. Store display
+  80–120px, mobile 64px; supporting text 16–18px; code 12–14px/1.8.
+- Spacing: existing 4px scale; desktop page gutters 40–64px, mobile 24px.
+  Panels use 2–4px corners, controls 2px, and restrained hard-offset shadows.
+  No tilted sticky-note surfaces, pill CTAs, accent borders or gradient blobs.
+- Real Store state drives increment, decrement, reset, and a subscribed code
+  output. Keep the existing regression-test selectors and negative values.
+- Native 44px controls, readable contrast, keyboard focus, localized labels,
+  polite value announcements. The illustration is decorative; all meaning
+  and functionality remain in accessible HTML.
+- Only interaction feedback transitions (160ms opacity/transform); respect
+  reduced motion. No continuous background animation or animation library.
+- Existing canonical MDX, Markdown endpoints, OG metadata and quick-start routes
+  remain available. Only index presentation bypasses the documentation shell.
+- The overall homepage explains package selection without a dependency diagram.
+- All 16 landings require functional browser checks and responsive captures;
+  the full revision requires type/build tests, independent review and CI.
+
 ## Existing system
 
 Use the existing Fumadocs neutral theme, Tailwind utilities, package color
@@ -9,7 +61,7 @@ introduce a second theme or font system.
 ## Reader journey
 
 Home explains the whole toolbox, groups all eight packages by user task,
-shows how the packages relate, and explains the two adjacent package choices.
+and explains adjacent package choices without a technical dependency map.
 Each package exposes separate introduction and quick-start links.
 Package indexes are the hands-on entry point: each offers a working example
 using that package, its corresponding code, and onward documentation links.
@@ -42,9 +94,9 @@ privilege one package with its own interactive or static API tutorial.
 
 ## Interactive package examples
 
-- Reuse a shared `DemoFrame`: localized title/instructions, live controls and
-  result, then the code for that interaction. At wide article widths these
-  areas may sit side by side; mobile uses one column.
+- Reuse a shared `DemoFrame`: a compact floating live surface and a dark code
+  panel integrated into the illustrated scene. Do not recreate an article
+  header or nested demo-card stack inside that surface.
 - Use the existing Fumadocs tokens and package accent, not stock photographs or
   a new brand. Numeric examples use tabular figures and a clear result area.
 - Controls have at least 44px target height, visible focus rings, disabled
@@ -80,5 +132,6 @@ under the task's local `.omo/evidence` directory.
 
 ## Accepted constraints
 
-This change retains Fumadocs' shared navigation and documentation components.
+This change retains Fumadocs for detailed documentation; package indexes use
+the illustrated landing shell and explicit documentation links.
 It does not redesign package APIs, release channels, or deployment behavior.

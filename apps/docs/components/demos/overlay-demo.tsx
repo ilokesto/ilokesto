@@ -64,7 +64,7 @@ function NotificationAdapter({
       role="status"
       aria-live="polite"
       data-demo-result="overlay-card"
-      className="rounded-xl border border-fd-border bg-fd-card p-4 text-fd-card-foreground shadow-sm"
+      className="mt-4 space-y-2 text-fd-card-foreground"
     >
       <p className="font-semibold">{String(title)}</p>
       <p className="mt-1 text-sm leading-6 text-fd-muted-foreground">{String(message)}</p>
@@ -159,16 +159,12 @@ export function OverlayDemo({ lang }: DemoProps) {
     : `const result = await display<string>({\n  type: 'notification',\n  props: { title: 'Upload complete' },\n});\n\n// Inside the adapter\nclose('closed');\nremove();`;
 
   return (
-    <DemoFrame
-      lang={lang}
-      name="overlay"
-      title={text.title}
-      description={text.description}
-      code={code}
-    >
-      <OverlayProvider store={store} adapters={adapters}>
-        <OverlayControls lang={lang} />
-      </OverlayProvider>
+    <DemoFrame lang={lang} name="overlay" title={text.title} description={text.description} code={code}>
+        <div className="space-y-4">
+          <OverlayProvider store={store} adapters={adapters}>
+            <div className="space-y-5"><OverlayControls lang={lang} /></div>
+          </OverlayProvider>
+        </div>
     </DemoFrame>
   );
 }

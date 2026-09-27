@@ -64,7 +64,7 @@ function ModalControls({ lang }: DemoProps) {
       ariaDescribedBy: descriptionId,
       dismissible: true,
       render: (close) => (
-        <section className="w-[min(26rem,calc(100vw-2rem))] rounded-2xl border border-fd-border bg-fd-card p-5 text-fd-card-foreground shadow-xl sm:p-6">
+        <section className="w-[min(26rem,calc(100vw-2rem))] rounded-sm border border-fd-border bg-fd-card p-5 text-fd-card-foreground shadow-xl shadow-fd-foreground/10 sm:p-6">
           <h2 id={titleId} className="text-lg font-semibold tracking-tight">{text.dialogTitle}</h2>
           <p id={descriptionId} className="mt-2 text-sm leading-6 text-fd-muted-foreground">{text.dialogBody}</p>
           <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -145,16 +145,12 @@ export function ModalDemo({ lang }: DemoProps) {
     : `const confirmed = await display<boolean>({\n  ariaLabelledBy: 'publish-title',\n  ariaDescribedBy: 'publish-description',\n  render: (close) => (\n    <section>\n      <h2 id="publish-title">Publish this draft?</h2>\n      <p id="publish-description">Make it visible to everyone.</p>\n      <button onClick={() => close(false)}>Cancel</button>\n      <button onClick={() => close(true)}>Publish</button>\n    </section>\n  ),\n});`;
 
   return (
-    <DemoFrame
-      lang={lang}
-      name="modal"
-      title={text.title}
-      description={text.description}
-      code={code}
-    >
-      <ModalProvider store={store}>
-        <ModalControls lang={lang} />
-      </ModalProvider>
+    <DemoFrame lang={lang} name="modal" title={text.title} description={text.description} code={code}>
+        <div className="space-y-4">
+          <ModalProvider store={store}>
+            <div className="space-y-5"><ModalControls lang={lang} /></div>
+          </ModalProvider>
+        </div>
     </DemoFrame>
   );
 }

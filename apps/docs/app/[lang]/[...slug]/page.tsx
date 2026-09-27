@@ -7,11 +7,22 @@ import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/components/mdx';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
+import { StoreLanding } from '@/components/landings/store-landing';
+import { PackageLanding } from '@/components/landings/package-landing';
+import { getLandingPackage } from '@/components/landings/landing-packages';
 
 export default async function Page(props: { params: Promise<{ lang: string; slug?: string[] }> }) {
   const params = await props.params;
   const page = source.getPage(params.slug, params.lang);
   if (!page) notFound();
+
+  if (params.slug?.length === 1 && params.slug[0] === 'store') {
+    return <StoreLanding lang={params.lang === 'ko' ? 'ko' : 'en'} />;
+  }
+  const landing = params.slug?.length === 1 ? getLandingPackage(params.slug[0]) : undefined;
+  if (landing) {
+    return <PackageLanding info={landing} lang={params.lang === 'ko' ? 'ko' : 'en'} />;
+  }
 
   const MDX = page.data.body;
 
