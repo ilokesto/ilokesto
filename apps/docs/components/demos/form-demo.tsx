@@ -31,49 +31,23 @@ const emailSchema: StandardSchemaV1<unknown, FormValues> = {
   },
 };
 
-const code = `import { CreateForm, type StandardSchemaV1 } from '@ilokesto/form';
-import { useForm } from '@ilokesto/form/react';
-import { useState } from 'react';
+const code = `const [form] = useState(() => new CreateForm({
+  defaultValues: { email: '' },
+  schema: emailSchema,
+  validateOn: ['submit'],
+}));
 
-const emailSchema: StandardSchemaV1<unknown, { email: string }> = {
-  '~standard': {
-    version: 1,
-    vendor: 'email-example',
-    validate(value) {
-      if (typeof value !== 'object' || value === null || !('email' in value)) {
-        return { issues: [{ message: 'Invalid email', path: ['email'] }] };
-      }
-      const email = value.email;
-      return typeof email === 'string' && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)
-        ? { value: { email } }
-        : { issues: [{ message: 'Invalid email', path: ['email'] }] };
-    },
-  },
-};
+const { handleSubmit, useField } = useForm(form);
+const email = useField({
+  name: 'email',
+  type: 'email',
+});
 
-function EmailForm() {
-  const [form] = useState(() => new CreateForm({
-    defaultValues: { email: '' },
-    schema: emailSchema,
-    validateOn: ['submit'],
-  }));
-  const [result, setResult] = useState('');
-  const { form: controller, handleSubmit, useField } = useForm(form);
-  const email = useField({ name: 'email', type: 'email' });
-
-  return (
-    <form noValidate onSubmit={handleSubmit(values => setResult(values.email))}>
-      <input {...email.props} />
-      {email.errors[0] && <p role="alert">{email.errors[0].message}</p>}
-      <button type="submit">Submit</button>
-      <button type="button" onClick={() => {
-        controller.reset();
-        setResult('');
-      }}>Reset</button>
-      <output>{result}</output>
-    </form>
-  );
-}`;
+<form noValidate onSubmit={handleSubmit(values => {
+  console.log(values.email);
+})}>
+  <input {...email.props} />
+</form>`;
 
 export function FormDemo({ lang }: DemoProps) {
   const copy = lang === 'ko'
@@ -117,14 +91,8 @@ export function FormDemo({ lang }: DemoProps) {
   };
 
   return (
-    <DemoFrame
-      lang={lang}
-      name="form"
-      title={copy.title}
-      description={copy.description}
-      code={code}
-    >
-      <form
+    <DemoFrame lang={lang} name="form" title={copy.title} description={copy.description} code={code}>
+        <form
         className="space-y-4"
         noValidate
         onSubmit={handleSubmit(
@@ -147,7 +115,7 @@ export function FormDemo({ lang }: DemoProps) {
             aria-describedby={email.errors.length > 0 ? errorId : undefined}
           />
           {email.errors[0] ? (
-            <p id={errorId} data-demo-result="form-error" role="alert" className="text-sm text-red-600 dark:text-red-400">
+            <p id={errorId} data-demo-result="form-error" role="alert" className="text-sm font-medium text-fd-primary">
               {copy.invalid}
             </p>
           ) : null}
@@ -170,15 +138,15 @@ export function FormDemo({ lang }: DemoProps) {
             {copy.reset}
           </button>
         </div>
-        <p data-demo-result="form-submit-count" className="text-xs text-fd-muted-foreground">
-          {copy.attempts(state.submitCount)}
-        </p>
-        <div className="min-h-12 rounded-xl border border-fd-border bg-fd-card px-4 py-3">
-          <p data-demo-result="form-success" role="status" aria-live="polite" className="text-sm font-medium text-fd-foreground">
-            {result ?? ''}
-          </p>
-        </div>
-      </form>
+          <div className="flex min-h-6 items-center justify-between gap-4">
+            <p data-demo-result="form-submit-count" className="text-xs text-fd-muted-foreground">
+              {copy.attempts(state.submitCount)}
+            </p>
+            <p data-demo-result="form-success" role="status" aria-live="polite" className="min-w-0 break-words text-sm font-medium text-fd-foreground">
+              {result ?? ''}
+            </p>
+          </div>
+        </form>
     </DemoFrame>
   );
 }

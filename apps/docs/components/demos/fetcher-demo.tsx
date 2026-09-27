@@ -125,15 +125,9 @@ export function FetcherDemo({ lang }: DemoProps) {
   const loading = state.kind === 'loading';
 
   return (
-    <DemoFrame
-      lang={lang}
-      name="fetcher"
-      title={text.title}
-      description={text.description}
-      code={fetcherSnippets[lang]}
-    >
-      <p className="text-sm leading-6 text-fd-muted-foreground break-keep">{text.instructions}</p>
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <DemoFrame lang={lang} name="fetcher" title={text.title} description={text.description} code={fetcherSnippets[lang]}>
+        <div className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button
           type="button"
           className={demoButtonClass}
@@ -163,8 +157,8 @@ export function FetcherDemo({ lang }: DemoProps) {
         </button>
       </div>
 
-      <div
-        className="min-h-32 rounded-xl border border-fd-border bg-fd-card p-4 text-sm text-fd-foreground sm:p-5"
+          <div
+        className="min-h-20 py-1 text-sm text-fd-foreground"
         data-result="fetcher-output"
         data-state={state.kind}
         aria-live="polite"
@@ -200,7 +194,8 @@ export function FetcherDemo({ lang }: DemoProps) {
             </dl>
           </div>
         )}
-      </div>
+          </div>
+        </div>
     </DemoFrame>
   );
 }

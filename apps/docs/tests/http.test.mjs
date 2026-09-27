@@ -55,6 +55,20 @@ after(async () => {
 });
 
 for (const lang of ['en', 'ko']) {
+  test(`${lang} homepage switches its shared palette in dark mode`, async () => {
+    const page = await browser.newPage({ colorScheme: 'light' });
+    try {
+      await page.goto(`${origin}/${lang}`);
+      const content = page.locator('main').last();
+      const lightBackground = await content.evaluate(element => getComputedStyle(element).backgroundColor);
+      await page.getByRole('button', { name: 'Toggle Theme' }).click();
+      await expect(page.locator('html')).toHaveClass(/dark/);
+      await expect(content).not.toHaveCSS('background-color', lightBackground);
+    } finally {
+      await page.close();
+    }
+  });
+
   for (const packageName of packages) {
     test(`${lang}/${packageName} index runs its real interactive example`, { timeout: 30_000 }, async () => {
       const page = await browser.newPage();
@@ -62,6 +76,8 @@ for (const lang of ['en', 'ko']) {
       page.on('pageerror', error => errors.push(error.message));
       try {
         await page.goto(`${origin}/${lang}/${packageName}`);
+        await expect(page.locator(`[data-landing="${packageName}"]`)).toBeVisible();
+        await expect(page.locator('#nd-sidebar')).toHaveCount(0);
         await expect(page.locator(`[data-demo="${packageName}"]`)).toBeVisible();
         await demoBehaviors[packageName](page);
         assert.deepEqual(errors, []);
@@ -80,6 +96,32 @@ test('demo HTTP service returns deterministic success and error payloads', async
   assert.equal(failure.status, 503);
   assert.equal((await failure.json()).error.code, 'DEMO_UNAVAILABLE');
   assert.equal(failure.headers.get('cache-control'), 'no-store');
+});
+
+test('package landings preserve illustration, locale and documentation routes', { timeout: 60_000 }, async () => {
+  const page = await browser.newPage();
+  try {
+    for (const name of packages) {
+      const illustration = await request(`/illustrations/${name}-workshop.webp`);
+      assert.equal(illustration.status, 200, name);
+      assert.match(illustration.headers.get('content-type'), /image\/webp/);
+      assert.equal(illustration.redirected, false);
+      await page.goto(`${origin}/en/${name}`);
+      await expect(page.locator('#nd-sidebar')).toHaveCount(0);
+      await Promise.all([
+        page.waitForURL(`${origin}/ko/${name}`),
+        page.locator('header a[hreflang="ko"]').click(),
+      ]);
+      await expect(page.locator(`[data-demo="${name}"]`)).toBeVisible();
+      await Promise.all([
+        page.waitForURL(`${origin}/ko/${name}/quick-start`),
+        page.locator(`header a[href="/ko/${name}/quick-start"]`).click(),
+      ]);
+      await expect(page.locator('#nd-sidebar')).toBeVisible();
+    }
+  } finally {
+    await page.close();
+  }
 });
 
 test('toast notifications are removed when client navigation unmounts the demo', { timeout: 30_000 }, async () => {

@@ -27,10 +27,17 @@ prefixes collection paths with the package name to preserve public URLs.
 English `.mdx` and Korean `.ko.mdx` pages share their package metadata.
 Fumadocs watches these source directories during development.
 
-Package indexes include `<PackageDemo name="store" lang="en" />` (with the
-appropriate package and locale). Implementations live in `components/demos`
-and import the real workspace packages. Each is loaded separately in the
-browser; static examples remain readable without JavaScript.
+Package index routes use the illustration-led presentation in
+`components/landings`, with original assets in `public/illustrations`.
+Each index links to its quick-start document in the standard documentation
+layout. The canonical package MDX remains the source for metadata, search,
+Markdown and full documentation content; it is not copied into the app.
+
+Interactive implementations live in `components/demos` and import the real
+workspace packages. Each is loaded separately in the browser. `DemoFrame`
+provides the floating controls and core-code panel; Store has a compact
+counter-specific composition. JavaScript-free visitors retain the index
+overview and documentation link, and full examples in the detailed docs.
 
 `pnpm docs:dev` and `pnpm docs:typecheck` prepare the package distributions.
 `pnpm docs:build` builds the documentation and its workspace dependencies in

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import styles from '../landings/store-landing.module.css';
 
 export type DemoProps = { readonly lang: 'en' | 'ko' };
 
@@ -29,23 +30,19 @@ export function DemoFrame({
     <section
       data-demo={name}
       aria-label={title}
-      className="not-prose my-8 min-w-0 overflow-hidden rounded-2xl border border-fd-border bg-fd-card"
+      className={styles.sceneDemo}
     >
-      <div className="border-b border-fd-border px-5 py-5 sm:px-6">
-        <p className="mb-2 text-xs font-semibold text-fd-muted-foreground">
-          {lang === 'ko' ? '직접 사용해 보기' : 'Try it here'}
-        </p>
-        <h2 className="text-xl font-semibold tracking-tight text-fd-foreground break-keep">{title}</h2>
-        <p className="mt-2 text-sm leading-6 text-fd-muted-foreground break-keep">{description}</p>
+      <div className={styles.sceneControls}>
+        <h2 className={styles.sceneTitle}>{title}</h2>
+        <p className="sr-only">{description}</p>
+        <div className="space-y-4">{children}</div>
       </div>
-      <div className="min-w-0 space-y-5 bg-fd-background/60 p-5 sm:p-6">
-        {children}
-      </div>
-      <div className="min-w-0 border-t border-fd-border">
-        <p className="px-5 pt-4 text-xs font-medium text-fd-muted-foreground sm:px-6">
-          {lang === 'ko' ? '이 예제의 핵심 코드' : 'The code behind this example'}
-        </p>
-        <pre tabIndex={0} aria-label={lang === 'ko' ? '예제 코드' : 'Example code'} className="max-h-80 overflow-auto p-5 text-xs leading-6 text-fd-foreground outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fd-ring sm:px-6">
+      <div className={styles.codePanel}>
+        <div className={styles.codeHeader}>
+          <span>{name}.tsx</span>
+          <span>{lang === 'ko' ? '핵심 코드' : 'Core snippet'}</span>
+        </div>
+        <pre tabIndex={0} aria-label={lang === 'ko' ? '예제 코드' : 'Example code'} className={styles.sceneCode}>
           <code>{code}</code>
         </pre>
       </div>

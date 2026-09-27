@@ -18,29 +18,28 @@ const selectIsEven = (state: Readonly<CounterState>) => state.count % 2 === 0;
 
 const code = `const useCounter = create({ count: 0 });
 
-function CountView() {
+function Counter() {
   const [count] = useCounter(state => state.count);
-  return <output>{count}</output>;
-}
+  const [isEven] = useCounter(
+    state => state.count % 2 === 0,
+  );
+  const setCounter = useCounter.writeOnly();
 
-function StatusView() {
-  const [isEven] = useCounter(state => state.count % 2 === 0);
-  return <output>{isEven ? 'Even' : 'Odd'}</output>;
-}
-
-const setCounter = useCounter.writeOnly();
-setCounter(state => ({ count: state.count + 1 }));`;
+  return <button onClick={() => setCounter(state => ({
+    count: state.count + 1,
+  }))}>{count} · {isEven ? 'Even' : 'Odd'}</button>;
+}`;
 
 function CountView({ useCounter, label }: { useCounter: CounterHook; label: string }) {
   const [count] = useCounter(selectCount);
 
   return (
-    <div className="rounded-xl border border-fd-border bg-fd-card p-4">
-      <p className="text-xs font-medium text-fd-muted-foreground">{label}</p>
+    <div className="text-center">
+      <p className="text-xs font-medium uppercase tracking-[0.14em] text-fd-muted-foreground">{label}</p>
       <output
         data-demo-result="state-count"
         aria-live="polite"
-        className="mt-2 block font-mono text-3xl font-semibold tabular-nums text-fd-foreground"
+        className="mt-1 block font-mono text-7xl font-semibold tracking-[-0.08em] tabular-nums text-fd-foreground"
       >
         {count}
       </output>
@@ -57,12 +56,12 @@ function StatusView({ useCounter, label, even, odd }: {
   const [isEven] = useCounter(selectIsEven);
 
   return (
-    <div className="rounded-xl border border-fd-border bg-fd-card p-4">
-      <p className="text-xs font-medium text-fd-muted-foreground">{label}</p>
+    <div className="flex items-center justify-center gap-2 text-sm">
+      <span className="text-fd-muted-foreground">{label}</span>
       <output
         data-demo-result="state-parity"
         aria-live="polite"
-        className="mt-2 block text-lg font-semibold text-fd-foreground"
+        className="rounded-sm bg-fd-accent px-3 py-1 font-semibold text-fd-accent-foreground"
       >
         {isEven ? even : odd}
       </output>
@@ -97,40 +96,19 @@ export function StateDemo({ lang }: DemoProps) {
       };
 
   return (
-    <DemoFrame
-      lang={lang}
-      name="state"
-      title={copy.title}
-      description={copy.description}
-      code={code}
-    >
-      <div className="grid gap-3 sm:grid-cols-2">
-        <CountView useCounter={useCounter} label={copy.countView} />
-        <StatusView
-          useCounter={useCounter}
-          label={copy.statusView}
-          even={copy.even}
-          odd={copy.odd}
-        />
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          data-demo-action="state-increment"
-          className={demoButtonClass}
-          onClick={() => setCounter(state => ({ count: state.count + 1 }))}
-        >
-          {copy.increment}
-        </button>
-        <button
-          type="button"
-          data-demo-action="state-reset"
-          className={demoSecondaryButtonClass}
-          onClick={() => setCounter({ count: 0 })}
-        >
-          {copy.reset}
-        </button>
-      </div>
+    <DemoFrame lang={lang} name="state" title={copy.title} description={copy.description} code={code}>
+        <div className="space-y-4">
+          <CountView useCounter={useCounter} label={copy.countView} />
+          <StatusView useCounter={useCounter} label={copy.statusView} even={copy.even} odd={copy.odd} />
+          <div className="flex flex-wrap justify-center gap-2">
+            <button type="button" data-demo-action="state-increment" className={demoButtonClass} onClick={() => setCounter(state => ({ count: state.count + 1 }))}>
+              {copy.increment}
+            </button>
+            <button type="button" data-demo-action="state-reset" className={demoSecondaryButtonClass} onClick={() => setCounter({ count: 0 })}>
+              {copy.reset}
+            </button>
+          </div>
+        </div>
     </DemoFrame>
   );
 }

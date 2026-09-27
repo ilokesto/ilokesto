@@ -1,11 +1,9 @@
 export const fetcherCopy = {
   en: {
-    title: 'Handle an HTTP result without throwing',
-    description:
-      'Send a same-origin request and inspect the structured success or failure returned by the safe API.',
-    instructions: 'Choose the deterministic response you want to inspect.',
-    successAction: 'Request demo success',
-    errorAction: 'Request demo error',
+    title: 'Handle HTTP results safely',
+    description: 'Inspect a typed success or failure from a same-origin request.',
+    successAction: 'Request success',
+    errorAction: 'Request error',
     reset: 'Reset',
     idle: 'No request sent yet.',
     loading: 'Requesting the demo response...',
@@ -21,12 +19,10 @@ export const fetcherCopy = {
     noResponse: 'No HTTP response',
   },
   ko: {
-    title: '예외 없이 HTTP 결과 처리하기',
-    description:
-      '동일 출처 요청을 보내고 safe API가 반환하는 구조화된 성공 또는 실패 결과를 확인하세요.',
-    instructions: '성공 또는 오류 응답을 선택해 결과를 확인하세요.',
-    successAction: '데모 성공 요청',
-    errorAction: '데모 오류 요청',
+    title: 'HTTP 결과를 안전하게 처리하기',
+    description: '동일 출처 요청의 성공 또는 실패 결과를 타입과 함께 확인하세요.',
+    successAction: '성공 요청',
+    errorAction: '오류 요청',
     reset: '초기화',
     idle: '아직 요청을 보내지 않았습니다.',
     loading: '데모 응답을 요청하고 있습니다...',
@@ -44,8 +40,7 @@ export const fetcherCopy = {
 } as const;
 
 export const fetcherSnippets = {
-  en: `// This endpoint returns fictional demo data only.
-const api = createFetcher<DemoPaths>();
+  en: `const api = createFetcher<DemoPaths>();
 const controller = new AbortController();
 const result = await api.safe.get('/api/demo/fetcher', {
   params: { query: { outcome: 'success' } },
@@ -56,8 +51,7 @@ if (result.ok) {
 } else {
   console.log(result.response?.status, result.error);
 }`,
-  ko: `// 이 엔드포인트는 가상의 데모 데이터만 반환합니다.
-const api = createFetcher<DemoPaths>();
+  ko: `const api = createFetcher<DemoPaths>();
 const controller = new AbortController();
 const result = await api.safe.get('/api/demo/fetcher', {
   params: { query: { outcome: 'success' } },

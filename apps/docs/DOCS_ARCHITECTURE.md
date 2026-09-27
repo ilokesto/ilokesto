@@ -41,6 +41,19 @@ Every package `index` page should try to answer these questions quickly:
 
 An index page is not just an introduction. It is a routing page.
 
+The site presents `/<language>/<package>` as an illustration-led landing with
+real package controls, a short core-code example, and a direct documentation
+link. Keep the documentation sidebar and table of contents on detailed pages,
+not on this landing. `quick-start` remains the complete setup path.
+
+Canonical index MDX stays in `packages/<package>/docs`. It still supplies
+metadata, search and machine-readable documentation; the application owns only
+the landing presentation and interactive components. Do not duplicate package
+documentation into the application to build a landing.
+
+The overall language homepage helps readers select among packages. It should
+not recreate a technical dependency diagram or privilege one package's demo.
+
 ## 4. Page type meanings
 
 ### `index`

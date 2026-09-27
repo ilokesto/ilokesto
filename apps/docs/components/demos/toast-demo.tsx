@@ -65,14 +65,9 @@ export function ToastDemo({ lang }: DemoProps) {
   };
 
   return (
-    <DemoFrame
-      lang={lang}
-      name="toast"
-      title={text.title}
-      description={text.description}
-      code={code}
-    >
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <DemoFrame lang={lang} name="toast" title={text.title} description={text.description} code={code}>
+        <div className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button
           type="button"
           data-demo-action="toast-success"
@@ -98,21 +93,22 @@ export function ToastDemo({ lang }: DemoProps) {
           {text.clear}
         </button>
       </div>
-      <p data-demo-result="toast" aria-live="polite" className="text-sm text-fd-muted-foreground">
-        {result}
-      </p>
-      <Toaster
-        toasterId={toasterId}
-        position="bottom-center"
-        limit={3}
-        toastOptions={demoToastOptions}
-      >
-        {(item) => (
-          <div data-demo-toast={item.type}>
-            <ToastBar toast={item} position="bottom-center" />
-          </div>
-        )}
-      </Toaster>
+          <p data-demo-result="toast" aria-live="polite" className="text-sm text-fd-muted-foreground">
+            {result}
+          </p>
+          <Toaster
+            toasterId={toasterId}
+            position="bottom-center"
+            limit={3}
+            toastOptions={demoToastOptions}
+          >
+            {(item) => (
+              <div data-demo-toast={item.type}>
+                <ToastBar toast={item} position="bottom-center" />
+              </div>
+            )}
+          </Toaster>
+        </div>
     </DemoFrame>
   );
 }

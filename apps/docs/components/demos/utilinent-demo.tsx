@@ -3,10 +3,10 @@
 import { For, Match, Show, Switch } from '@ilokesto/utilinent';
 import { useRef, useState } from 'react';
 import {
-  DemoFrame,
-  type DemoProps,
-  demoButtonClass,
-  demoSecondaryButtonClass,
+    DemoFrame,
+    type DemoProps,
+    demoButtonClass,
+    demoSecondaryButtonClass,
 } from './demo-frame';
 
 type DemoItem = { readonly id: number; readonly label: string };
@@ -16,7 +16,6 @@ const copy = {
     title: 'Compose conditional and list states',
     description:
       'Use Show, For, and Switch to express hidden, empty, and populated UI branches without nested ternaries.',
-    instructions: 'Hide the list, remove every item, or add an item to move between branches.',
     hide: 'Hide list',
     show: 'Show list',
     add: 'Add item',
@@ -34,7 +33,6 @@ const copy = {
     title: '조건부 상태와 목록 상태 조합하기',
     description:
       'Show, For, Switch로 중첩 삼항 연산자 없이 숨김, 빈 목록, 채워진 목록 분기를 표현하세요.',
-    instructions: '목록을 숨기거나 모든 항목을 제거하거나 새 항목을 추가해 분기를 전환하세요.',
     hide: '목록 숨기기',
     show: '목록 보이기',
     add: '항목 추가',
@@ -90,15 +88,9 @@ export function UtilinentDemo({ lang }: DemoProps) {
   };
 
   return (
-    <DemoFrame
-      lang={lang}
-      name="utilinent"
-      title={text.title}
-      description={text.description}
-      code={snippet}
-    >
-      <p className="text-sm leading-6 text-fd-muted-foreground break-keep">{text.instructions}</p>
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <DemoFrame lang={lang} name="utilinent" title={text.title} description={text.description} code={snippet}>
+        <div className="space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button
           type="button"
           className={demoButtonClass}
@@ -127,8 +119,8 @@ export function UtilinentDemo({ lang }: DemoProps) {
         </button>
       </div>
 
-      <div
-        className="rounded-xl border border-fd-border bg-fd-card p-4 sm:p-5"
+          <div
+        className="space-y-2"
         data-result="utilinent-branch"
         data-state={!visible ? 'hidden' : items.length === 0 ? 'empty' : 'populated'}
         aria-live="polite"
@@ -150,7 +142,7 @@ export function UtilinentDemo({ lang }: DemoProps) {
       <Show
         when={visible}
         fallback={
-          <p className="rounded-xl border border-dashed border-fd-border p-4 text-sm text-fd-muted-foreground">
+          <p className="py-3 text-sm text-fd-muted-foreground">
             {text.hidden}
           </p>
         }
@@ -159,7 +151,7 @@ export function UtilinentDemo({ lang }: DemoProps) {
           <For
             each={items}
             fallback={
-              <li className="rounded-xl border border-dashed border-fd-border p-4 text-sm text-fd-muted-foreground">
+              <li className="py-3 text-sm text-fd-muted-foreground">
                 {text.emptyList}
               </li>
             }
@@ -167,7 +159,7 @@ export function UtilinentDemo({ lang }: DemoProps) {
             {(item) => (
               <li
                 key={item.id}
-                className="flex min-w-0 flex-col gap-3 rounded-xl border border-fd-border bg-fd-background p-3 sm:flex-row sm:items-center sm:justify-between"
+                className="flex min-w-0 items-center justify-between gap-3 border-b border-fd-border py-2 last:border-0"
               >
                 <span className="min-w-0 break-words text-sm text-fd-foreground">{item.label}</span>
                 <button
@@ -183,7 +175,8 @@ export function UtilinentDemo({ lang }: DemoProps) {
             )}
           </For>
         </ul>
-      </Show>
+          </Show>
+        </div>
     </DemoFrame>
   );
 }
