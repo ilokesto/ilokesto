@@ -24,8 +24,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify:
-    name: verify
+  plan:
+    name: Plan verification
     if: >-
       github.event_name == 'pull_request' ||
       (
@@ -92,6 +92,52 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check changesets
+        if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
+        run: pnpm changeset:status
+
+      - name: Select affected packages
+        id: affected
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CI_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_FORCE_FULL: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'changeset-release/main' }}
+        run: node scripts/ci-plan.mjs
+
+    outputs:
+      full: ${{ steps.affected.outputs.full }}
+      has_packages: ${{ steps.affected.outputs.has_packages }}
+      matrix: ${{ steps.affected.outputs.matrix }}
+
+  full:
+    name: Full verification
+    needs: plan
+    if: needs.plan.outputs.full == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_head_sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Install Playwright Chromium
         run: pnpm --filter @ilokesto/modal exec playwright install --with-deps chromium
 
@@ -125,6 +171,107 @@ jobs:
       - name: Verify fetcher distribution
         run: pnpm --filter @ilokesto/fetcher test:dist
 
-      - name: Check changesets
-        if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
-        run: pnpm changeset:status
+  packages:
+    name: Package (${{ matrix.package }})
+    needs: plan
+    if: needs.plan.outputs.full == 'false' && needs.plan.outputs.has_packages == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      PACKAGE: ${{ matrix.package }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package and prerequisites
+        run: pnpm --filter "$PACKAGE..." --if-present run build
+
+      - name: Typecheck package
+        run: pnpm --filter "$PACKAGE" --if-present run typecheck
+
+      - name: Test package
+        run: pnpm --filter "$PACKAGE" --if-present run test
+
+      - name: Verify form distribution
+        if: matrix.package == '@ilokesto/form'
+        run: pnpm --filter @ilokesto/form test:pack
+
+      - name: Typecheck state tests
+        if: matrix.package == '@ilokesto/state'
+        run: pnpm --filter @ilokesto/state test:typecheck
+
+      - name: Install Playwright Chromium
+        if: matrix.package == '@ilokesto/modal'
+        run: pnpm --filter @ilokesto/modal exec playwright install --with-deps chromium
+
+      - name: Verify modal package
+        if: matrix.package == '@ilokesto/modal'
+        run: pnpm --filter @ilokesto/modal test:pack
+
+      - name: Test modal end-to-end behavior
+        if: matrix.package == '@ilokesto/modal'
+        run: pnpm --filter @ilokesto/modal test:e2e
+
+      - name: Test modal accessibility
+        if: matrix.package == '@ilokesto/modal'
+        run: pnpm --filter @ilokesto/modal test:a11y
+
+      - name: Verify fetcher distribution
+        if: matrix.package == '@ilokesto/fetcher'
+        run: pnpm --filter @ilokesto/fetcher test:dist
+
+  verify:
+    name: verify
+    needs: [plan, full, packages]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Require all selected checks
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          FULL_SELECTED: ${{ needs.plan.outputs.full }}
+          HAS_PACKAGES: ${{ needs.plan.outputs.has_packages }}
+          FULL_RESULT: ${{ needs.full.result }}
+          PACKAGES_RESULT: ${{ needs.packages.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$PLAN_RESULT" == "success" ]] || exit 1
+
+          case "$FULL_SELECTED:$HAS_PACKAGES" in
+            true:true|true:false)
+              [[ "$FULL_RESULT" == "success" && "$PACKAGES_RESULT" == "skipped" ]] || exit 1
+              ;;
+            false:true)
+              [[ "$FULL_RESULT" == "skipped" && "$PACKAGES_RESULT" == "success" ]] || exit 1
+              ;;
+            false:false)
+              [[ "$FULL_RESULT" == "skipped" && "$PACKAGES_RESULT" == "skipped" ]] || exit 1
+              ;;
+            *)
+              printf 'Invalid verification plan\n' >&2
+              exit 1
+              ;;
+          esac
