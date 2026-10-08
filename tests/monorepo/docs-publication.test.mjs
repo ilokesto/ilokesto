@@ -40,10 +40,10 @@ test('all eight complete immutable snapshots verify against committed sources an
   let mdxCount = 0;
   for (const [name, snapshot] of verified.snapshots) {
     const entry = snapshot.entry;
-    assert.equal(entry.docsCommit, docsCommit);
+    assert.equal(entry.docsCommit, candidate.packages[name].docsCommit);
     assert.equal(entry.releaseCommit, RELEASE_COMMIT);
-    assert.equal(snapshot.receipt.schemaVersion, 1);
-    assert.equal(snapshot.receipt.exampleSource.commit, RELEASE_COMMIT);
+    assert.equal(snapshot.receipt.schemaVersion, 2);
+    assert.equal(snapshot.receipt.exampleSource.commit, entry.docsCommit);
     assert.equal(snapshot.receipt.runtimeSource.commit, RELEASE_COMMIT);
     assert.equal(snapshot.receipt.registry.gitHead, null);
     assert.equal(snapshot.receipt.registry.attestations, null);
@@ -56,12 +56,24 @@ test('all eight complete immutable snapshots verify against committed sources an
       if (file.startsWith('revision/docs/') && file.endsWith('.mdx')) mdxCount++;
       if (file.startsWith('release/') || file.startsWith('revision/')) {
         const [label, ...suffix] = file.split('/');
-        const source = label === 'release' ? RELEASE_COMMIT : docsCommit;
+        const source = label === 'release' ? RELEASE_COMMIT : entry.docsCommit;
         assert.deepEqual(bytes, git(rootDir, ['show', `${source}:packages/${name}/${suffix.join('/')}`]));
       }
     }
   }
   assert.equal(mdxCount, 338);
+});
+
+test('the retained schema 1 archive still verifies with release-commit examples', async () => {
+  const receiptBytes = await readFile(path.join(rootDir, 'docs-publication/releases/store/2.0.0/r1/receipt.json'));
+  const receipt = JSON.parse(receiptBytes);
+  const entry = { ...receipt.package, receiptSha256: hash(receiptBytes) };
+
+  const snapshot = await verifySnapshot({ rootDir, entry });
+
+  assert.equal(snapshot.receipt.schemaVersion, 1);
+  assert.equal(snapshot.receipt.exampleSource.commit, RELEASE_COMMIT);
+  assert.equal(snapshot.receipt.docsRevision.commit, docsCommit);
 });
 
 test('new snapshots freeze revised examples and transitive helpers while retaining released runtime bytes', async (t) => {
@@ -95,7 +107,7 @@ test('new snapshots freeze revised examples and transitive helpers while retaini
   }).toString().trim();
   verifyDocsRevision({ rootDir: root, releaseCommit: RELEASE_COMMIT, docsCommit: revisionCommit, packageNames: ['state'] });
   for (const file of sources.keys()) await writeFile(path.join(root, file), 'uncommitted source must not be captured');
-  const identity = releaseEntry('state', RELEASE_COMMIT, revisionCommit, 2);
+  const identity = releaseEntry('state', RELEASE_COMMIT, revisionCommit, candidate.packages.state.revision + 1);
 
   const built = buildSnapshot({
     rootDir: root, entry: identity,
@@ -233,7 +245,9 @@ test('generation is independent of current working docs/examples and replaces on
   }
   const landing = await readFile(path.join(root, 'docs-publication/runtime/.generated/store/store-landing.tsx'), 'utf8');
   const imports = importSpecifiers(landing).map((entry) => entry.value);
-  assert.ok(imports.includes('@ilokesto/released-store'));
+  assert.ok(imports.includes('./store-demo'));
+  const storeDemo = await readFile(path.join(root, 'docs-publication/runtime/.generated/store/store-demo.tsx'), 'utf8');
+  assert.ok(importSpecifiers(storeDemo).some((entry) => entry.value === '@ilokesto/released-store'));
   assert.ok(imports.includes('@/components/landings/landing-shell'));
   assert.ok(imports.includes('@/components/landings/store-landing.module.css'));
   const fetcher = await readFile(path.join(root, 'docs-publication/runtime/.generated/fetcher/fetcher-demo.tsx'), 'utf8');

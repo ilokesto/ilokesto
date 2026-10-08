@@ -18,6 +18,11 @@ The 338-page bilingual corpus comes from the actual publication checkout
 `ecd9709b76d1976ec86865314e85b916f220c818`, with corrected release framing at
 `fc8bd4755137b75767284dbe84a0774185dfbdde`.
 
+Revision 2 selects the compact, stable landing examples reviewed at
+`e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c` for all eight packages. It retains
+the same npm versions, release corpus, runtime aliases and dependency closure.
+Revision 1 archives remain available and unchanged.
+
 These npm versions have registry signatures but no npm gitHead/source
 attestation. Workflow records, annotated tags, manifest/README matching and
 distribution comparisons support the source association. The receipts retain

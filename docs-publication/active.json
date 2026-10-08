@@ -5,81 +5,81 @@
       "name": "@ilokesto/store",
       "version": "2.0.0",
       "channel": "latest",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/store/2.0.0/r1",
-      "receiptSha256": "ff994a9172ee1c156352f42ae7242b78d9eee8c488c137df3894a26df9f81598"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/store/2.0.0/r2",
+      "receiptSha256": "01e43650edf0c6f91469394aab87bb188cee58cb9b8cbd0fc31755b13a82c6b1"
     },
     "state": {
       "name": "@ilokesto/state",
       "version": "2.0.0",
       "channel": "latest",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/state/2.0.0/r1",
-      "receiptSha256": "a7c88aa46b2f0870eee76a5ea76d881cea9344da224307b47df2e8aaeb26eb03"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/state/2.0.0/r2",
+      "receiptSha256": "2bc6c9c7b8e311147011712e44025941c268cce2fe40c5410a1c2504959a7032"
     },
     "form": {
       "name": "@ilokesto/form",
       "version": "2.0.0",
       "channel": "latest",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/form/2.0.0/r1",
-      "receiptSha256": "ed855cbf688becc2c4145c748363e99ecd182d52ba259af52f23ba9f2c51d8a6"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/form/2.0.0/r2",
+      "receiptSha256": "8d57c45b98aff38a9e375364623f7b8f617f3aa84526f2775e060a6ae3c9a8ae"
     },
     "overlay": {
       "name": "@ilokesto/overlay",
       "version": "2.0.0",
       "channel": "latest",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/overlay/2.0.0/r1",
-      "receiptSha256": "18f60d75d419549b3fe3a869b997d58cdbfa032dca63a0a1acce1fa1630d91a9"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/overlay/2.0.0/r2",
+      "receiptSha256": "0f901af9636ee39bbcc7bd04804dc66118479c37c000c4001ed20db6924abb63"
     },
     "modal": {
       "name": "@ilokesto/modal",
       "version": "2.0.0",
       "channel": "latest",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/modal/2.0.0/r1",
-      "receiptSha256": "0c48bd58a1027308eec6b84dc234af3a031ac2af0893dff6e5e232b8d0f71cb6"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/modal/2.0.0/r2",
+      "receiptSha256": "a9e3d14a4d7fbedd468850ba804319dd6a116e96f0120ce87e73d13c0d5a07d8"
     },
     "toast": {
       "name": "@ilokesto/toast",
       "version": "2.0.0",
       "channel": "latest",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/toast/2.0.0/r1",
-      "receiptSha256": "14c148ea4dde47943c0c251c91b532fe61abd38afd01f16d79e8f633dc0a02f7"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/toast/2.0.0/r2",
+      "receiptSha256": "93b8282cc81908946e2e5e156e0e33bcf7745d190ccdab66e7d59e9278dce910"
     },
     "fetcher": {
       "name": "@ilokesto/fetcher",
       "version": "1.0.0",
       "channel": "beta",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/fetcher/1.0.0/r1",
-      "receiptSha256": "9d14fd31d47ef5d7ed43bf4cd1808e75f9af1f564c240a1cce3911be1b495b50"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/fetcher/1.0.0/r2",
+      "receiptSha256": "42059b680d09003e1ef3645a876a8bf930c74610c5f92bf73b600cd3fe7eb38e"
     },
     "utilinent": {
       "name": "@ilokesto/utilinent",
       "version": "1.2.0",
       "channel": "latest",
-      "revision": 1,
+      "revision": 2,
       "releaseCommit": "ecd9709b76d1976ec86865314e85b916f220c818",
-      "docsCommit": "fc8bd4755137b75767284dbe84a0774185dfbdde",
-      "snapshot": "docs-publication/releases/utilinent/1.2.0/r1",
-      "receiptSha256": "6b0ccf06a00ff358be4665ae3c3f3475373fbf87303d743d9cf348a71e8b6448"
+      "docsCommit": "e0e50ec2ec4f4d487b6c9f35ea9ee2f243684c5c",
+      "snapshot": "docs-publication/releases/utilinent/1.2.0/r2",
+      "receiptSha256": "d8e33d65901d9f56d7d1e24fa8679de647f399f7ae53fca0df0602d76b8a119f"
     }
   }
 }
