@@ -95,6 +95,21 @@ test("selected jobs build prerequisites but check only the selected package", as
   assert.ok(!runs.includes("pnpm typecheck"));
 });
 
+test("selected docs tests install their own Chromium before launching browser fixtures", async () => {
+  const { jobs } = parse(await readWorkflow("ci.yml"));
+  const steps = jobs.packages.steps;
+  const install = steps.findIndex((step) =>
+    step.run === "pnpm --filter @ilokesto/docs exec playwright install --with-deps chromium",
+  );
+  const tests = steps.findIndex((step) =>
+    step.run === 'pnpm --filter "$PACKAGE" --if-present run test',
+  );
+
+  assert.ok(install >= 0, "the isolated docs runner needs its own browser installation");
+  assert.ok(install < tests, "docs fixtures launch Chromium in the package test command");
+  assert.equal(steps[install].if, "matrix.package == '@ilokesto/docs'");
+});
+
 test("full and selected verification preserve every specialized package check", async () => {
   const { jobs } = parse(await readWorkflow("ci.yml"));
   const checks = [
