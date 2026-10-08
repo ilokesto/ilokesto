@@ -210,6 +210,10 @@ jobs:
       - name: Typecheck package
         run: pnpm --filter "$PACKAGE" --if-present run typecheck
 
+      - name: Install docs browser
+        if: matrix.package == '@ilokesto/docs'
+        run: pnpm --filter @ilokesto/docs exec playwright install --with-deps chromium
+
       - name: Test package
         run: pnpm --filter "$PACKAGE" --if-present run test
 
