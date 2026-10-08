@@ -30,6 +30,16 @@ displayed code strings are preserved. Missing or modified inputs fail closed.
 Builds verify checked-in bytes and do not need Git history or registry access
 after a frozen dependency install.
 
+New captures use receipt schema 2: documentation and API-bearing examples,
+including transitive helpers, are frozen from the explicit reviewed `docsCommit`.
+The original release corpus, package runtime source and npm artifact remain
+pinned to `releaseCommit`. Existing schema 1 receipts retain their original
+release-commit examples and hashes; they are verified, never migrated or
+overwritten. Both schemas check the example commit identity, archived file
+inventory and Git blob hashes offline. Neither capture nor generation falls back
+to working-tree examples. These checks bind the archived bytes to the reviewed
+receipt; they do not add a cryptographic npm source attestation.
+
 The private `runtime` workspace installs exact npm aliases. Its committed
 closure records the executed React dependency graph, including shared
 React/ReactDOM, ky and icons. Verification rejects workspace package paths,
@@ -46,8 +56,10 @@ Promotion is explicit, never a side effect of a main-branch documentation edit.
    `scripts/docs-publication/catalog.mjs`; retain old records. Packages may use
    different release commits. Pin the evidence report hash and preserve any
    provenance limitations.
-2. Commit canonical documentation corrections. The selected package's runtime
-   source, manifest and build files must match its release commit. If current
+2. Commit canonical documentation and demo/helper corrections, reviewed against
+   the selected npm APIs, and select that commit as `docsCommit`. The selected
+   package's runtime source, manifest and build files must match its release
+   commit. If current
    main has incompatible source changes, prepare the docs revision on that
    release's source instead of copying newer APIs into old documentation.
 3. Capture a candidate with explicit immutable inputs:

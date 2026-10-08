@@ -1,9 +1,9 @@
 export const fetcherCopy = {
   en: {
-    title: 'Handle HTTP results safely',
-    description: 'Inspect a typed success or failure from a same-origin request.',
-    successAction: 'Request success',
-    errorAction: 'Request error',
+    title: 'Load a teammate profile',
+    description: 'Request a demo profile or an unavailable service. Inspect the typed result.',
+    successAction: 'Load profile',
+    errorAction: 'Try failure',
     reset: 'Reset',
     idle: 'No request sent yet.',
     loading: 'Requesting the demo response...',
@@ -19,10 +19,10 @@ export const fetcherCopy = {
     noResponse: 'No HTTP response',
   },
   ko: {
-    title: 'HTTP 결과를 안전하게 처리하기',
-    description: '동일 출처 요청의 성공 또는 실패 결과를 타입과 함께 확인하세요.',
-    successAction: '성공 요청',
-    errorAction: '오류 요청',
+    title: '팀원 프로필 불러오기',
+    description: '데모 프로필과 서비스 오류를 요청하고 타입이 연결된 결과를 확인하세요.',
+    successAction: '프로필 요청',
+    errorAction: '오류 재현',
     reset: '초기화',
     idle: '아직 요청을 보내지 않았습니다.',
     loading: '데모 응답을 요청하고 있습니다...',
@@ -41,25 +41,23 @@ export const fetcherCopy = {
 
 export const fetcherSnippets = {
   en: `const api = createFetcher<DemoPaths>();
-const controller = new AbortController();
-const result = await api.safe.get('/api/demo/fetcher', {
-  params: { query: { outcome: 'success' } },
-}, { signal: controller.signal, retry: 0 });
-
-if (result.ok) {
-  console.log(result.response.status, result.data.profile);
-} else {
-  console.log(result.response?.status, result.error);
-}`,
+const result = await api.safe.get(
+  '/api/demo/fetcher',
+  { params: { query: { outcome } } },
+  { signal, retry: 0 },
+);
+if (result.ok)
+  showProfile(result.data.profile);
+else
+  showError(result.error);`,
   ko: `const api = createFetcher<DemoPaths>();
-const controller = new AbortController();
-const result = await api.safe.get('/api/demo/fetcher', {
-  params: { query: { outcome: 'success' } },
-}, { signal: controller.signal, retry: 0 });
-
-if (result.ok) {
-  console.log(result.response.status, result.data.profile);
-} else {
-  console.log(result.response?.status, result.error);
-}`,
+const result = await api.safe.get(
+  '/api/demo/fetcher',
+  { params: { query: { outcome } } },
+  { signal, retry: 0 },
+);
+if (result.ok)
+  showProfile(result.data.profile);
+else
+  showError(result.error);`,
 } as const;

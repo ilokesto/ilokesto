@@ -1,10 +1,16 @@
 'use client';
 
-import { Store } from '@ilokesto/store';
-import { useState } from 'react';
-import { StoreLandingView } from './store-landing-view';
+import { StoreDemo } from '../demos/store-demo';
+import { LandingShell } from './landing-shell';
+import { landingPackages } from './landing-packages';
+import styles from './store-landing.module.css';
 
 export function StoreLanding({ lang }: { readonly lang: 'en' | 'ko' }) {
-  const [store] = useState(() => new Store({ count: 0 }));
-  return <StoreLandingView lang={lang} store={store} />;
+  return (
+    <LandingShell info={landingPackages[0]} lang={lang}>
+      <div className={styles.packageWorkspace} id="store-demo" data-demo-slot="store">
+        <StoreDemo lang={lang} />
+      </div>
+    </LandingShell>
+  );
 }

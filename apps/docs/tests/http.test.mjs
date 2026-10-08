@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { expect } from '@playwright/test';
 import publication from '../../../docs-publication/active.json' with { type: 'json' };
 import { demoBehaviors } from './demo-behaviors.mjs';
+import { currentDemoBehaviors } from './current-demo-behaviors.mjs';
 import { createDocsSite } from './http-fixture.mjs';
 
 const site = createDocsSite();
@@ -35,7 +36,9 @@ for (const lang of ['en', 'ko']) {
         await expect(page.locator('[data-landing]')).toHaveAttribute(
           'data-runtime-version', channel === 'next' ? 'workspace' : publication.packages[name].version,
         );
-        await demoBehaviors[name](page);
+        const revised = channel === 'next' || publication.packages[name].revision > 1;
+        if (revised) await expect(page.locator('[data-demo-code] .line span').first()).toBeVisible();
+        await (revised ? currentDemoBehaviors : demoBehaviors)[name](page);
         assert.deepEqual(errors, []);
       } finally { await page.close(); }
     });

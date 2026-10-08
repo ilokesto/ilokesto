@@ -3,6 +3,7 @@
 import { createFetcher } from '@ilokesto/fetcher';
 import { fetcherCopy, fetcherSnippets } from './fetcher-copy';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import styles from '../landings/store-landing.module.css';
 import {
   DemoFrame,
   type DemoProps,
@@ -127,7 +128,7 @@ export function FetcherDemo({ lang }: DemoProps) {
   return (
     <DemoFrame lang={lang} name="fetcher" title={text.title} description={text.description} code={fetcherSnippets[lang]}>
         <div className="space-y-4">
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <div className={styles.demoToolbar}>
         <button
           type="button"
           className={demoButtonClass}
@@ -158,7 +159,7 @@ export function FetcherDemo({ lang }: DemoProps) {
       </div>
 
           <div
-        className="min-h-20 py-1 text-sm text-fd-foreground"
+        className={`${styles.demoViewport} py-1 text-sm text-fd-foreground`}
         data-result="fetcher-output"
         data-state={state.kind}
         aria-live="polite"
@@ -169,7 +170,7 @@ export function FetcherDemo({ lang }: DemoProps) {
         {state.kind === 'success' && (
           <div className="space-y-3">
             <p className="font-medium">{text.demoLabel} · {text.success}</p>
-            <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-x-4 gap-y-2">
+            <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-x-4 gap-y-1">
               <dt className="text-fd-muted-foreground">{text.status}</dt>
               <dd className="font-mono tabular-nums">{state.status}</dd>
               <dt className="text-fd-muted-foreground">{text.id}</dt>
@@ -184,7 +185,7 @@ export function FetcherDemo({ lang }: DemoProps) {
         {state.kind === 'error' && (
           <div className="space-y-3">
             <p className="font-medium">{text.demoLabel} · {text.error}</p>
-            <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-x-4 gap-y-2">
+            <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-x-4 gap-y-1">
               <dt className="text-fd-muted-foreground">{text.status}</dt>
               <dd className="font-mono tabular-nums">{state.status ?? text.noResponse}</dd>
               <dt className="text-fd-muted-foreground">{text.code}</dt>

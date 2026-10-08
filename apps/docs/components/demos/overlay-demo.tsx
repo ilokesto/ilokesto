@@ -14,68 +14,99 @@ import {
   demoSecondaryButtonClass,
   type DemoProps,
 } from './demo-frame';
+import styles from '../landings/store-landing.module.css';
 
 const copy = {
   en: {
-    title: 'A provider-scoped notification',
-    description: 'Open a lightweight card through the real overlay store and adapter, then observe the result returned when it closes.',
-    open: 'Open notification',
+    title: 'Assign a review from a detail panel',
+    description: 'Open task details without blocking the page. Choose a teammate and keep the returned assignment.',
+    open: 'Task details',
     reset: 'Reset',
-    cardTitle: 'Upload complete',
-    cardBody: 'The overlay is rendered by a custom, non-modal adapter.',
-    close: 'Close notification',
-    idle: 'No result yet.',
-    waiting: 'Waiting for the notification to close...',
-    closed: 'Result: notification closed.',
+    cardTitle: 'Review the landing page',
+    cardBody: 'Who should review this task?',
+    close: 'Close',
+    idle: 'No reviewer selected.',
+    waiting: 'Choose a reviewer in the panel.',
+    closed: 'Result: panel closed.',
+    mina: 'Mina',
+    alex: 'Alex',
+    assignedMina: 'Result: assigned to Mina.',
+    assignedAlex: 'Result: assigned to Alex.',
+    preview: 'Task details appear here.',
     cleared: 'Result reset.',
   },
   ko: {
-    title: '프로바이더 범위의 알림',
-    description: '프로바이더가 관리하는 실제 저장소와 렌더링 방식을 사용해 알림 카드를 열고, 닫힐 때 반환되는 결과를 확인합니다.',
-    open: '알림 열기',
+    title: '상세 패널에서 리뷰 담당자 지정하기',
+    description: '페이지를 막지 않고 작업 상세를 엽니다. 팀원을 선택하면 패널이 반환한 담당자가 화면에 남습니다.',
+    open: '작업 상세',
     reset: '초기화',
-    cardTitle: '업로드 완료',
-    cardBody: '사용자 정의 비모달 렌더러가 이 알림을 표시합니다.',
-    close: '알림 닫기',
-    idle: '아직 결과가 없습니다.',
-    waiting: '알림이 닫히기를 기다리는 중...',
-    closed: '결과: 알림이 닫혔습니다.',
+    cardTitle: '랜딩 페이지 리뷰',
+    cardBody: '누가 이 작업을 리뷰할까요?',
+    close: '닫기',
+    idle: '선택한 리뷰 담당자가 없습니다.',
+    waiting: '패널에서 리뷰 담당자를 선택하세요.',
+    closed: '결과: 패널을 닫았습니다.',
+    mina: '미나',
+    alex: '알렉스',
+    assignedMina: '결과: 미나에게 배정했습니다.',
+    assignedAlex: '결과: 알렉스에게 배정했습니다.',
+    preview: '여기에 작업 상세가 표시됩니다.',
     cleared: '결과를 초기화했습니다.',
   },
 } as const;
 
-function NotificationAdapter({
+function TaskAdapter({
   isOpen,
   close,
   remove,
   title,
   message,
   closeLabel,
+  minaLabel,
+  alexLabel,
 }: OverlayRenderProps & Record<string, unknown>) {
   if (!isOpen) return null;
 
-  const handleClose = () => {
-    close('closed');
+  const handleClose = (reviewer: string) => {
+    close(reviewer);
     remove();
   };
 
   return (
     <aside
-      role="status"
-      aria-live="polite"
+      aria-label={String(title)}
       data-demo-result="overlay-card"
-      className="mt-4 space-y-2 text-fd-card-foreground"
+      className={`${styles.demoViewport} ${styles.demoPreview} gap-2`}
+      style={{ gridArea: '3 / 1' }}
     >
       <p className="font-semibold">{String(title)}</p>
-      <p className="mt-1 text-sm leading-6 text-fd-muted-foreground">{String(message)}</p>
-      <button
-        type="button"
-        data-demo-action="overlay-close"
-        className={`${demoSecondaryButtonClass} mt-3 w-full sm:w-auto`}
-        onClick={handleClose}
-      >
-        {String(closeLabel)}
-      </button>
+      <p className="text-sm leading-5">{String(message)}</p>
+      <div className={styles.demoToolbar}>
+        <button
+          type="button"
+          data-demo-action="overlay-select-mina"
+          className={demoButtonClass}
+          onClick={() => handleClose('mina')}
+        >
+          {String(minaLabel)}
+        </button>
+        <button
+          type="button"
+          data-demo-action="overlay-select-alex"
+          className={demoSecondaryButtonClass}
+          onClick={() => handleClose('alex')}
+        >
+          {String(alexLabel)}
+        </button>
+        <button
+          type="button"
+          data-demo-action="overlay-close"
+          className={demoSecondaryButtonClass}
+          onClick={() => handleClose('closed')}
+        >
+          {String(closeLabel)}
+        </button>
+      </div>
     </aside>
   );
 }
@@ -86,24 +117,30 @@ function OverlayControls({ lang }: DemoProps) {
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<string>(text.idle);
   const runRef = useRef(0);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const openNotification = async () => {
+  const openTask = async () => {
     const run = ++runRef.current;
     setPending(true);
     setResult(text.waiting);
 
     const closeResult = await display<string>({
-      type: 'notification',
+      type: 'task',
       props: {
         title: text.cardTitle,
         message: text.cardBody,
         closeLabel: text.close,
+        minaLabel: text.mina,
+        alexLabel: text.alex,
       },
     });
 
     if (run === runRef.current) {
       setPending(false);
-      setResult(closeResult === 'closed' ? text.closed : text.cleared);
+      setResult(closeResult === 'mina' ? text.assignedMina
+        : closeResult === 'alex' ? text.assignedAlex
+          : closeResult === 'closed' ? text.closed : text.cleared);
+      triggerRef.current?.focus();
     }
   };
 
@@ -121,28 +158,39 @@ function OverlayControls({ lang }: DemoProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className={styles.demoToolbar}>
         <button
+          ref={triggerRef}
           type="button"
           data-demo-action="overlay-open"
-          className={`${demoButtonClass} w-full sm:w-auto`}
-          disabled={pending}
-          onClick={() => void openNotification()}
+          className={demoButtonClass}
+          aria-disabled={pending}
+          aria-expanded={pending}
+          onClick={() => {
+            if (!pending) void openTask();
+          }}
         >
           {text.open}
         </button>
         <button
           type="button"
           data-demo-action="overlay-reset"
-          className={`${demoSecondaryButtonClass} w-full sm:w-auto`}
+          className={demoSecondaryButtonClass}
           onClick={reset}
         >
           {text.reset}
         </button>
       </div>
-      <p data-demo-result="overlay" aria-live="polite" className="text-sm text-fd-muted-foreground">
+      <p data-demo-result="overlay" role="status" className={`${styles.demoStatus} h-10 overflow-auto`}>
         {result}
       </p>
+      <div
+        data-demo-result="overlay-viewport"
+        className={`${styles.demoViewport} ${styles.demoPreview} text-sm`}
+        style={{ gridArea: '3 / 1' }}
+      >
+        {!pending && text.preview}
+      </div>
     </>
   );
 }
@@ -151,20 +199,20 @@ export function OverlayDemo({ lang }: DemoProps) {
   const text = copy[lang];
   const [store] = useState(createOverlayStore);
   const adapters = useMemo<OverlayAdapterMap>(
-    () => ({ notification: NotificationAdapter }),
+    () => ({ task: TaskAdapter }),
     [],
   );
   const code = lang === 'ko'
-    ? `const result = await display<string>({\n  type: 'notification',\n  props: { title: '업로드 완료' },\n});\n\n// adapter 내부\nclose('closed');\nremove();`
-    : `const result = await display<string>({\n  type: 'notification',\n  props: { title: 'Upload complete' },\n});\n\n// Inside the adapter\nclose('closed');\nremove();`;
+    ? `const reviewer =\n  await display<string>({\n    type: 'task',\n    props: { title: '랜딩 페이지 리뷰' },\n  });\n\n// 패널에서 팀원 선택\nclose('mina');\nremove();`
+    : `const reviewer =\n  await display<string>({\n    type: 'task',\n    props: { title: 'Review this page' },\n  });\n\n// Choose a reviewer in the panel\nclose('mina');\nremove();`;
 
   return (
     <DemoFrame lang={lang} name="overlay" title={text.title} description={text.description} code={code}>
-        <div className="space-y-4">
-          <OverlayProvider store={store} adapters={adapters}>
-            <div className="space-y-5"><OverlayControls lang={lang} /></div>
-          </OverlayProvider>
-        </div>
+      <div className="grid grid-cols-1 gap-3">
+        <OverlayProvider store={store} adapters={adapters}>
+          <OverlayControls lang={lang} />
+        </OverlayProvider>
+      </div>
     </DemoFrame>
   );
 }

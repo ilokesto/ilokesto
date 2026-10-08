@@ -108,6 +108,30 @@ privilege one package with its own interactive or static API tutorial.
 
 ## Interactive package examples
 
+### Compact, stable demonstrations (issue #101)
+
+This revision replaces the counter/parity examples and supersedes the earlier
+counter-specific controls. Preserve every illustration and the industrial palette.
+
+- Show one practical task per package, with a short visible instruction.
+- Core snippets contain at most 12 lines, normally at most 42 characters per line.
+  Keep all lines visible without vertical code scrolling or smaller type to fit.
+  Link complete setup to the matching channel's documentation.
+- Use one shared syntax-highlighted code panel with a copy control. The unhighlighted
+  loading state has exactly the same line boxes as the highlighted result.
+- Keep controls anchored during errors, results, loading, reset, and repeated input.
+  Reserve space for field errors and results at first render; use a bounded preview
+  area for variable lists and overlays rather than changing the scene's height.
+- Controls use the existing paper, graphite, and ochre tokens, 44px targets and
+  2px corners. Preview tones use those same tokens and a text label.
+- Measure element coordinates before and after actions, including user-triggered
+  shifts that the browser's CLS score excludes. Do not animate height or move the
+  page to make space. Respect reduced motion and preserve keyboard focus.
+- On phones keep the artwork above the workspace; the document still owns vertical
+  scrolling. Compact code and bounded demo contents must not create page overflow.
+- Verify all eight packages, both languages, released and next channels, at phone
+  and desktop widths. Frozen examples change only through a new publication revision.
+
 - Reuse a shared `DemoFrame`: a compact floating live surface and a dark code
   panel integrated into the illustrated scene. Do not recreate an article
   header or nested demo-card stack inside that surface.

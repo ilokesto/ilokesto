@@ -1,9 +1,10 @@
 'use client';
 
-import { CreateForm, type StandardSchemaV1 } from '@ilokesto/form';
+import type { StandardSchemaV1 } from '@ilokesto/form';
 import { useForm } from '@ilokesto/form/react';
 import { useId, useState } from 'react';
 
+import styles from '../landings/store-landing.module.css';
 import {
   DemoFrame,
   type DemoProps,
@@ -12,9 +13,11 @@ import {
   demoSecondaryButtonClass,
 } from './demo-frame';
 
-type FormValues = { email: string };
+type FormValues = { email: string; role: 'member' | 'admin' };
 
-const emailSchema: StandardSchemaV1<unknown, FormValues> = {
+const defaultValues: FormValues = { email: '', role: 'member' };
+
+const inviteSchema: StandardSchemaV1<unknown, FormValues> = {
   '~standard': {
     version: 1,
     vendor: 'ilokesto-docs',
@@ -24,83 +27,91 @@ const emailSchema: StandardSchemaV1<unknown, FormValues> = {
       }
 
       const email = value.email;
-      return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ? { value: { email } }
-        : { issues: [{ message: 'invalid_email', path: ['email'] }] };
+      if (typeof email !== 'string' || email.length > 64 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return { issues: [{ message: 'invalid_email', path: ['email'] }] };
+      }
+
+      if (!('role' in value) || (value.role !== 'member' && value.role !== 'admin')) {
+        return { issues: [{ message: 'invalid_role', path: ['role'] }] };
+      }
+
+      return { value: { email, role: value.role } };
     },
   },
 };
 
-const code = `const [form] = useState(() => new CreateForm({
-  defaultValues: { email: '' },
-  schema: emailSchema,
+const code = `const form = useForm({
+  defaultValues, schema: inviteSchema,
   validateOn: ['submit'],
-}));
-
-const { handleSubmit, useField } = useForm(form);
-const email = useField({
-  name: 'email',
-  type: 'email',
 });
-
-<form noValidate onSubmit={handleSubmit(values => {
-  console.log(values.email);
-})}>
-  <input {...email.props} />
-</form>`;
+const email = form.useField({
+  name: 'email', type: 'email',
+});
+const submit = form.handleSubmit(
+  setResult, () => setResult(null),
+);`;
 
 export function FormDemo({ lang }: DemoProps) {
   const copy = lang === 'ko'
     ? {
-        title: '제출할 때 검증하는 이메일 폼',
-        description: '이메일을 입력하고 제출해 보세요. Form이 값을 관리하고, 검증을 통과한 값만 결과에 표시합니다.',
-        label: '이메일 주소',
-        placeholder: 'hello@example.com',
-        invalid: '올바른 이메일 주소를 입력해 주세요.',
-        submit: '이메일 확인',
+        title: '팀원 초대',
+        description: '이메일과 역할을 입력해 초대 정보를 검증하세요. 실제 이메일은 전송하지 않습니다.',
+        label: '이메일 (필수)',
+        placeholder: 'you@team.io',
+        invalid: '올바른 이메일을 입력하세요.',
+        role: '팀 역할',
+        member: '팀원',
+        admin: '관리자',
+        invalidRole: '역할을 선택하세요.',
+        submit: '초대 확인',
         reset: '초기화',
-        success: (email: string) => `${email} 주소를 사용할 수 있습니다.`,
+        success: (role: FormValues['role']) => `${role === 'admin' ? '관리자' : '팀원'} 초대 준비 완료`,
         attempts: (count: number) => `제출 횟수: ${count}`,
       }
     : {
-        title: 'An email form that validates on submit',
-        description: 'Enter an email and submit it. Form owns the value and only shows a result after validation passes.',
-        label: 'Email address',
-        placeholder: 'hello@example.com',
-        invalid: 'Enter a valid email address.',
-        submit: 'Check email',
+        title: 'Invite a teammate',
+        description: 'Validate an email and team role to prepare an invitation. No email is sent.',
+        label: 'Email (required)',
+        placeholder: 'you@team.io',
+        invalid: 'Enter a valid email.',
+        role: 'Team role',
+        member: 'Member',
+        admin: 'Admin',
+        invalidRole: 'Choose a team role.',
+        submit: 'Check invite',
         reset: 'Reset',
-        success: (email: string) => `${email} is ready to use.`,
+        success: (role: FormValues['role']) => `${role === 'admin' ? 'Admin' : 'Member'} invite ready.`,
         attempts: (count: number) => `Submit attempts: ${count}`,
       };
-  const [form] = useState(() => new CreateForm<FormValues>({
-    defaultValues: { email: '' },
-    schema: emailSchema,
+  const [result, setResult] = useState<FormValues | null>(null);
+  const { form, handleSubmit, useField, useFormState } = useForm({
+    defaultValues,
+    schema: inviteSchema,
     validateOn: ['submit'],
-  }));
-  const [result, setResult] = useState<string | null>(null);
-  const { form: controller, handleSubmit, useField, useFormState } = useForm(form);
+  });
   const email = useField({ name: 'email', type: 'email' });
+  const role = useField<HTMLSelectElement>({ name: 'role' });
   const state = useFormState();
   const inputId = useId();
   const errorId = `${inputId}-error`;
+  const roleId = `${inputId}-role`;
+  const roleErrorId = `${roleId}-error`;
+  const submit = handleSubmit(setResult, () => setResult(null));
 
   const reset = () => {
-    controller.reset();
+    form.reset();
     setResult(null);
   };
 
   return (
     <DemoFrame lang={lang} name="form" title={copy.title} description={copy.description} code={code}>
-        <form
-        className="space-y-4"
+      <form
+        className="space-y-3"
         noValidate
-        onSubmit={handleSubmit(
-          values => setResult(copy.success(values.email)),
-          () => setResult(null),
-        )}
+        onSubmit={submit}
       >
-        <div className="space-y-2">
+        <div className={styles.demoFields}>
+        <div className={styles.demoField}>
           <label htmlFor={inputId} className="block text-sm font-medium text-fd-foreground">
             {copy.label}
           </label>
@@ -111,16 +122,36 @@ export function FormDemo({ lang }: DemoProps) {
             className={demoInputClass}
             placeholder={copy.placeholder}
             autoComplete="email"
+            maxLength={64}
+            required
             aria-invalid={email.errors.length > 0}
             aria-describedby={email.errors.length > 0 ? errorId : undefined}
           />
-          {email.errors[0] ? (
-            <p id={errorId} data-demo-result="form-error" role="alert" className="text-sm font-medium text-fd-primary">
-              {copy.invalid}
-            </p>
-          ) : null}
+          <p id={errorId} data-demo-result="form-error" role="status" className="h-5 text-xs font-medium leading-5 text-fd-primary">
+            {email.errors.length > 0 ? copy.invalid : ''}
+          </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className={styles.demoField}>
+          <label htmlFor={roleId} className="block text-sm font-medium text-fd-foreground">
+            {copy.role}
+          </label>
+          <select
+            {...role.props}
+            id={roleId}
+            data-demo-input="form-role"
+            className={demoInputClass}
+            aria-invalid={role.errors.length > 0}
+            aria-describedby={role.errors.length > 0 ? roleErrorId : undefined}
+          >
+            <option value="member">{copy.member}</option>
+            <option value="admin">{copy.admin}</option>
+          </select>
+          <p id={roleErrorId} role="status" className="h-5 text-xs font-medium leading-5 text-fd-primary">
+            {role.errors.length > 0 ? copy.invalidRole : ''}
+          </p>
+        </div>
+        </div>
+        <div className={styles.demoToolbar}>
           <button
             type="submit"
             data-demo-action="form-submit"
@@ -138,15 +169,15 @@ export function FormDemo({ lang }: DemoProps) {
             {copy.reset}
           </button>
         </div>
-          <div className="flex min-h-6 items-center justify-between gap-4">
-            <p data-demo-result="form-submit-count" className="text-xs text-fd-muted-foreground">
-              {copy.attempts(state.submitCount)}
-            </p>
-            <p data-demo-result="form-success" role="status" aria-live="polite" className="min-w-0 break-words text-sm font-medium text-fd-foreground">
-              {result ?? ''}
-            </p>
-          </div>
-        </form>
+        <div className={styles.demoStatus}>
+          <p data-demo-result="form-submit-count" className="text-xs text-fd-muted-foreground">
+            {copy.attempts(state.submitCount)}
+          </p>
+          <p data-demo-result="form-success" role="status" className="h-5 min-w-0 break-words text-sm font-medium leading-5 text-fd-foreground">
+            {result ? copy.success(result.role) : ''}
+          </p>
+        </div>
+      </form>
     </DemoFrame>
   );
 }

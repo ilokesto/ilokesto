@@ -9,37 +9,44 @@ import {
   demoSecondaryButtonClass,
   type DemoProps,
 } from './demo-frame';
+import styles from '../landings/store-landing.module.css';
 
 const copy = {
   en: {
-    title: 'Await an accessible confirmation',
-    description: 'Confirm or cancel with the buttons, Escape, or the backdrop. The awaited result remains visible after the dialog is cleaned up.',
-    open: 'Open confirmation',
+    title: 'Publish a release note',
+    description: 'Confirm to move this sample from draft to published. Cancel keeps the draft; reset lets you try again. Nothing is sent.',
+    open: 'Publish draft',
     reset: 'Reset',
-    dialogTitle: 'Publish this draft?',
-    dialogBody: 'The draft will become visible to everyone with access to this project.',
+    dialogTitle: 'Publish this release note?',
+    dialogBody: 'This demo changes the release note below to Published. No real content is sent or published.',
     cancel: 'Cancel',
     confirm: 'Publish',
-    idle: 'No decision yet.',
+    itemTitle: 'October release notes',
+    draft: 'Draft · private',
+    published: 'Published · demo only',
+    idle: 'Ready for review.',
     waiting: 'Waiting for a decision...',
-    confirmed: 'Result: confirmed.',
-    cancelled: 'Result: cancelled.',
-    dismissed: 'Result: dismissed with Escape or the backdrop.',
+    confirmed: 'Result: published in this demo.',
+    cancelled: 'Result: cancelled. Draft kept.',
+    dismissed: 'Result: dismissed. Draft kept.',
   },
   ko: {
-    title: '접근 가능한 확인창의 결과 기다리기',
-    description: '버튼, Escape 키 또는 배경을 눌러 결정합니다. 대화상자가 닫혀 정리된 뒤에도 기다린 결과가 화면에 남습니다.',
-    open: '확인창 열기',
+    title: '릴리스 노트 게시하기',
+    description: '확인하면 예시 초안이 게시 상태가 됩니다. 취소하면 초안이 유지되고, 초기화하면 다시 시도할 수 있습니다. 실제 전송은 없습니다.',
+    open: '초안 게시',
     reset: '초기화',
-    dialogTitle: '이 초안을 게시할까요?',
-    dialogBody: '이 프로젝트에 접근할 수 있는 모든 사용자에게 초안이 공개됩니다.',
+    dialogTitle: '이 릴리스 노트를 게시할까요?',
+    dialogBody: '아래 예시 릴리스 노트를 게시 상태로 바꿉니다. 실제 콘텐츠를 전송하거나 게시하지 않습니다.',
     cancel: '취소',
     confirm: '게시',
-    idle: '아직 결정하지 않았습니다.',
+    itemTitle: '10월 릴리스 노트',
+    draft: '초안 · 비공개',
+    published: '게시됨 · 데모 전용',
+    idle: '검토할 준비가 되었습니다.',
     waiting: '결정을 기다리는 중...',
-    confirmed: '결과: 확인했습니다.',
-    cancelled: '결과: 취소했습니다.',
-    dismissed: '결과: Escape 또는 배경으로 닫았습니다.',
+    confirmed: '결과: 데모에서 게시했습니다.',
+    cancelled: '결과: 취소하고 초안을 유지했습니다.',
+    dismissed: '결과: 닫고 초안을 유지했습니다.',
   },
 } as const;
 
@@ -47,6 +54,7 @@ function ModalControls({ lang }: DemoProps) {
   const text = copy[lang];
   const { clear, display } = useModal();
   const [pending, setPending] = useState(false);
+  const [published, setPublished] = useState(false);
   const [result, setResult] = useState<string>(text.idle);
   const runRef = useRef(0);
   const reactId = useId().replace(/:/g, '');
@@ -91,6 +99,7 @@ function ModalControls({ lang }: DemoProps) {
 
     if (run === runRef.current) {
       setPending(false);
+      if (confirmed === true) setPublished(true);
       setResult(confirmed === true ? text.confirmed : confirmed === false ? text.cancelled : text.dismissed);
     }
   };
@@ -99,6 +108,7 @@ function ModalControls({ lang }: DemoProps) {
     runRef.current += 1;
     clear();
     setPending(false);
+    setPublished(false);
     setResult(text.idle);
   };
 
@@ -109,14 +119,14 @@ function ModalControls({ lang }: DemoProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className={styles.demoToolbar}>
         <button
           type="button"
           data-demo-action="modal-open"
-          className={`${demoButtonClass} w-full sm:w-auto`}
-          aria-disabled={pending}
+          className={demoButtonClass}
+          aria-disabled={pending || published}
           onClick={() => {
-            if (!pending) void openConfirmation();
+            if (!pending && !published) void openConfirmation();
           }}
         >
           {text.open}
@@ -124,13 +134,19 @@ function ModalControls({ lang }: DemoProps) {
         <button
           type="button"
           data-demo-action="modal-reset"
-          className={`${demoSecondaryButtonClass} w-full sm:w-auto`}
+          className={demoSecondaryButtonClass}
           onClick={reset}
         >
           {text.reset}
         </button>
       </div>
-      <p data-demo-result="modal" aria-live="polite" className="text-sm text-fd-muted-foreground">
+      <div className={`${styles.demoPreview} h-20 overflow-auto`}>
+        <p className="text-sm font-semibold">{text.itemTitle}</p>
+        <p data-demo-result="modal-document" className="text-sm">
+          {published ? text.published : text.draft}
+        </p>
+      </div>
+      <p data-demo-result="modal" role="status" className={`${styles.demoStatus} h-10 overflow-auto`}>
         {result}
       </p>
     </>
@@ -141,16 +157,14 @@ export function ModalDemo({ lang }: DemoProps) {
   const text = copy[lang];
   const [store] = useState(createOverlayStore);
   const code = lang === 'ko'
-    ? `const confirmed = await display<boolean>({\n  ariaLabelledBy: 'publish-title',\n  ariaDescribedBy: 'publish-description',\n  render: (close) => (\n    <section>\n      <h2 id="publish-title">초안을 게시할까요?</h2>\n      <p id="publish-description">모든 사용자에게 공개됩니다.</p>\n      <button onClick={() => close(false)}>취소</button>\n      <button onClick={() => close(true)}>게시</button>\n    </section>\n  ),\n});`
-    : `const confirmed = await display<boolean>({\n  ariaLabelledBy: 'publish-title',\n  ariaDescribedBy: 'publish-description',\n  render: (close) => (\n    <section>\n      <h2 id="publish-title">Publish this draft?</h2>\n      <p id="publish-description">Make it visible to everyone.</p>\n      <button onClick={() => close(false)}>Cancel</button>\n      <button onClick={() => close(true)}>Publish</button>\n    </section>\n  ),\n});`;
+    ? `const confirmed =\n  await display<boolean>({\n    ariaLabel: '초안을 게시할까요?',\n    render: close => (\n      <button\n        onClick={() => close(true)}>\n        게시\n      </button>\n    ),\n  });\nif (confirmed) setPublished(true);`
+    : `const confirmed =\n  await display<boolean>({\n    ariaLabel: 'Publish this draft?',\n    render: close => (\n      <button\n        onClick={() => close(true)}>\n        Publish\n      </button>\n    ),\n  });\nif (confirmed) setPublished(true);`;
 
   return (
     <DemoFrame lang={lang} name="modal" title={text.title} description={text.description} code={code}>
-        <div className="space-y-4">
-          <ModalProvider store={store}>
-            <div className="space-y-5"><ModalControls lang={lang} /></div>
-          </ModalProvider>
-        </div>
+      <ModalProvider store={store}>
+        <div className="space-y-3"><ModalControls lang={lang} /></div>
+      </ModalProvider>
     </DemoFrame>
   );
 }
