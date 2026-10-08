@@ -73,3 +73,45 @@ Each package owns its `docs/` folder. The private `apps/docs` Next.js/Fumadocs w
 - **Release**: Root Changesets versioning and the gated release job in `.github/workflows/ci.yml` create release PRs and publish packages after verification. `fetcher` publishes on `beta`; stable packages publish on `latest`.
 - **Documentation**: Root build, typecheck, and tests include `apps/docs`. Vercel builds this workspace directly with package-owned documentation; cross-repository sync workflows are retired.
 - **CI**: Root CI installs one lockfile, builds in dependency order, and preserves package-specific quality gates.
+
+### Dependency-aware PR verification
+
+The `Verify` workflow keeps `verify` as its final required check. Its `plan` job
+reads workspace manifests and the PR's merge-base-to-head diff. Package changes
+select the owning workspace and its transitive workspace consumers. Nested
+example workspaces are matched before their parent package.
+
+| Changed package | Library checks | Additional consumers |
+| --- | --- | --- |
+| `modal` | `modal` | docs |
+| `toast` | `toast` | docs |
+| `overlay` | `overlay`, `modal`, `toast` | docs |
+| `form` | `form` | form examples and docs |
+| `store` | `store`, `state`, `form`, `overlay`, `modal`, `toast` | form examples and docs |
+
+Each selected job builds the package and its dependencies with the pnpm `...`
+selector, but runs tests and typechecking only for the selected package. Building
+`overlay` as a prerequisite of `modal` does not select overlay tests. The docs app
+is a real workspace consumer: its builds may still require all library builds,
+but they do not run those libraries' tests.
+
+Specialized checks remain attached to their package: modal includes Chromium,
+E2E, accessibility and package verification; form includes packed-consumer checks;
+state includes test typechecking; fetcher includes distribution checks.
+
+Package documentation-only changes select docs consumers. Changeset Markdown
+and known root prose can produce an empty package selection, but ordinary PRs
+still validate Changesets and must pass the final gate. Manifest, lockfile,
+workspace configuration, CI, shared tooling and unclassified changes fall back
+to the original full verification path. Release PRs and guarded release-head
+dispatches always use that full path; the exact-SHA validation remains mandatory
+before checkout.
+
+The final gate always runs. Planning must succeed, the selected execution path
+must succeed, and the unselected path must be skipped. Failure, cancellation,
+missing outputs and unexpected skips cannot yield a successful `verify`.
+
+Selection lives in `scripts/ci-plan.mjs`; selection and workflow gate behavior
+are tested under `tests/monorepo/ci-*.test.mjs`. Runtime package changes need no
+hardcoded CI dependency list. Workspace installation remains frozen and shared;
+this design scopes verification, not dependency installation.
