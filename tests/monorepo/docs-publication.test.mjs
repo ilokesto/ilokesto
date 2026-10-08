@@ -5,9 +5,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import {
-  PACKAGE_NAMES, RELEASE_COMMIT, adaptInstallations, collectExamples, currentManifestHash,
+  PACKAGE_NAMES, RELEASE_COMMIT, adaptInstallations, buildSnapshot, collectExamples, currentManifestHash,
   generatePublication, hash, importSpecifiers, inventory, promotePublication,
-  rewriteExampleImports, tarFiles, validateManifest, verifyDocsRevision,
+  releaseEntry, rewriteExampleImports, tarFiles, validateManifest, verifyDocsRevision,
   verifyPublication, verifySnapshot, writeImmutableSnapshot,
 } from '../../scripts/docs-publication.mjs';
 import { diskFiles, git, gitText, json } from '../../scripts/docs-publication/io.mjs';
@@ -40,8 +40,11 @@ test('all eight complete immutable snapshots verify against committed sources an
   let mdxCount = 0;
   for (const [name, snapshot] of verified.snapshots) {
     const entry = snapshot.entry;
-    assert.equal(entry.docsCommit, docsCommit);
+    assert.equal(entry.docsCommit, candidate.packages[name].docsCommit);
     assert.equal(entry.releaseCommit, RELEASE_COMMIT);
+    assert.equal(snapshot.receipt.schemaVersion, 2);
+    assert.equal(snapshot.receipt.exampleSource.commit, entry.docsCommit);
+    assert.equal(snapshot.receipt.runtimeSource.commit, RELEASE_COMMIT);
     assert.equal(snapshot.receipt.registry.gitHead, null);
     assert.equal(snapshot.receipt.registry.attestations, null);
     assert.equal(snapshot.receipt.provenance.kind, 'operational-evidence-not-cryptographic-source-provenance');
@@ -53,12 +56,119 @@ test('all eight complete immutable snapshots verify against committed sources an
       if (file.startsWith('revision/docs/') && file.endsWith('.mdx')) mdxCount++;
       if (file.startsWith('release/') || file.startsWith('revision/')) {
         const [label, ...suffix] = file.split('/');
-        const source = label === 'release' ? RELEASE_COMMIT : docsCommit;
+        const source = label === 'release' ? RELEASE_COMMIT : entry.docsCommit;
         assert.deepEqual(bytes, git(rootDir, ['show', `${source}:packages/${name}/${suffix.join('/')}`]));
       }
     }
   }
   assert.equal(mdxCount, 338);
+});
+
+test('the retained schema 1 archive still verifies with release-commit examples', async () => {
+  const receiptBytes = await readFile(path.join(rootDir, 'docs-publication/releases/store/2.0.0/r1/receipt.json'));
+  const receipt = JSON.parse(receiptBytes);
+  const entry = { ...receipt.package, receiptSha256: hash(receiptBytes) };
+
+  const snapshot = await verifySnapshot({ rootDir, entry });
+
+  assert.equal(snapshot.receipt.schemaVersion, 1);
+  assert.equal(snapshot.receipt.exampleSource.commit, RELEASE_COMMIT);
+  assert.equal(snapshot.receipt.docsRevision.commit, docsCommit);
+});
+
+test('new snapshots freeze revised examples and transitive helpers while retaining released runtime bytes', async (t) => {
+  const root = await fixture(t);
+  const original = await verifySnapshot({ rootDir: root, entry: candidate.packages.state });
+  // An independent object database/index keeps fixture commits out of the repository.
+  await rm(path.join(root, '.git'));
+  git(root, ['init', '--quiet']);
+  const commonDir = gitText(rootDir, ['rev-parse', '--path-format=absolute', '--git-common-dir']);
+  await writeFile(path.join(root, '.git/objects/info/alternates'), `${commonDir}/objects\n`);
+  git(root, ['read-tree', docsCommit]);
+  const sourcePath = 'apps/docs/components/demos/state-demo.tsx';
+  const helperPath = 'apps/docs/components/demos/revision-helper.ts';
+  const leafPath = 'apps/docs/components/demos/revision-leaf.ts';
+  const sources = new Map([
+    [sourcePath, "import { create } from '@ilokesto/state/react';\nimport { initial } from './revision-helper';\nexport const demo = create(initial);\n"],
+    [helperPath, "export { initial } from './revision-leaf';\n"],
+    [leafPath, 'export const initial = 7;\n'],
+  ]);
+  await mkdir(path.dirname(path.join(root, sourcePath)), { recursive: true });
+  for (const [file, source] of sources) await writeFile(path.join(root, file), source);
+  git(root, ['add', '--', ...sources.keys()]);
+  const tree = gitText(root, ['write-tree']);
+  const revisionCommit = git(root, ['commit-tree', tree, '-p', docsCommit, '-m', 'Revise example fixture'], {
+    env: {
+      ...process.env,
+      GIT_AUTHOR_NAME: 'Publication Test', GIT_AUTHOR_EMAIL: 'publication@example.test',
+      GIT_COMMITTER_NAME: 'Publication Test', GIT_COMMITTER_EMAIL: 'publication@example.test',
+      GIT_AUTHOR_DATE: '2026-10-08T00:00:00Z', GIT_COMMITTER_DATE: '2026-10-08T00:00:00Z',
+    },
+  }).toString().trim();
+  verifyDocsRevision({ rootDir: root, releaseCommit: RELEASE_COMMIT, docsCommit: revisionCommit, packageNames: ['state'] });
+  for (const file of sources.keys()) await writeFile(path.join(root, file), 'uncommitted source must not be captured');
+  const identity = releaseEntry('state', RELEASE_COMMIT, revisionCommit, candidate.packages.state.revision + 1);
+
+  const built = buildSnapshot({
+    rootDir: root, entry: identity,
+    tarball: original.files.get('npm/package.tgz'),
+    report: original.files.get('provenance/release-provenance.md'),
+  });
+
+  assert.equal(built.receipt.schemaVersion, 2);
+  assert.equal(built.receipt.exampleSource.commit, revisionCommit);
+  assert.deepEqual(built.receipt.exampleSource.files.map((file) => file.path), [...sources.keys()].sort());
+  for (const [file, source] of sources) assert.equal(built.files.get(`examples/${file}`).toString(), source);
+  assert.notDeepEqual(built.files.get(`examples/${sourcePath}`), original.files.get(`examples/${sourcePath}`));
+  assert.deepEqual(built.receipt.runtimeSource, original.receipt.runtimeSource);
+  assert.deepEqual(built.receipt.releaseSource, original.receipt.releaseSource);
+  assert.deepEqual(built.receipt.registry, original.receipt.registry);
+  assert.deepEqual(built.files.get('npm/package.tgz'), original.files.get('npm/package.tgz'));
+
+  const entry = { ...identity, receiptSha256: hash(built.files.get('receipt.json')) };
+  const base = path.join(root, entry.snapshot);
+  await writeImmutableSnapshot(base, built.files);
+  const manifest = structuredClone(candidate);
+  manifest.packages.state = entry;
+  await writeFile(path.join(root, 'docs-publication/active.json'), json(manifest));
+  await rm(path.join(root, '.git'), { recursive: true });
+  await generatePublication({ rootDir: root });
+  const generated = await readFile(path.join(root, 'docs-publication/runtime/.generated/state/state-demo.tsx'), 'utf8');
+  assert.deepEqual(importSpecifiers(generated).map((specifier) => specifier.value), [
+    '@ilokesto/released-state/react', './_source/apps/docs/components/demos/revision-helper',
+  ]);
+  assert.equal(await readFile(path.join(root, 'docs-publication/runtime/.generated/state/_source', leafPath), 'utf8'), sources.get(leafPath));
+
+  const receiptPath = path.join(base, 'receipt.json');
+  for (const [change, expected] of [
+    [(receipt) => { receipt.package.docsCommit = docsCommit; }, /receipt identity/],
+    [(receipt) => { receipt.schemaVersion = 3; }, /receipt schema/],
+    [(receipt) => { receipt.schemaVersion = 1; }, /example source commit/],
+    [(receipt) => { receipt.exampleSource.commit = RELEASE_COMMIT; }, /example source commit/],
+    [(receipt) => { receipt.runtimeSource.commit = revisionCommit; }, /runtime source commit/],
+    [(receipt) => { receipt.exampleSource.files.pop(); }, /example source inventory/],
+    [(receipt) => { receipt.exampleSource.files[0].blob = '0'.repeat(40); }, /example source blob/],
+    [(receipt) => { receipt.exampleSource.files[0].mode = '120000'; }, /example source mode/],
+  ]) {
+    const receipt = structuredClone(built.receipt);
+    change(receipt);
+    const bytes = Buffer.from(json(receipt));
+    await writeFile(receiptPath, bytes);
+    await assert.rejects(verifySnapshot({ rootDir: root, entry: { ...entry, receiptSha256: hash(bytes) } }), expected);
+  }
+  await writeFile(receiptPath, built.files.get('receipt.json'));
+  await writeFile(path.join(base, 'examples', leafPath), 'export const initial = 99;\n');
+  await assert.rejects(verifySnapshot({ rootDir: root, entry }), /snapshot file inventory/);
+  const forged = structuredClone(built.receipt);
+  const changedFiles = await diskFiles(base);
+  changedFiles.delete('receipt.json');
+  forged.files = inventory(changedFiles);
+  const forgedBytes = Buffer.from(json(forged));
+  await writeFile(receiptPath, forgedBytes);
+  await assert.rejects(verifySnapshot({ rootDir: root, entry: { ...entry, receiptSha256: hash(forgedBytes) } }), /example source blob/);
+  await writeFile(path.join(base, 'examples', leafPath), sources.get(leafPath));
+  await writeFile(receiptPath, built.files.get('receipt.json'));
+  await verifySnapshot({ rootDir: root, entry });
 });
 
 test('identity validation rejects partial packages, missing fields, bad channels and unsafe paths', () => {
@@ -135,7 +245,9 @@ test('generation is independent of current working docs/examples and replaces on
   }
   const landing = await readFile(path.join(root, 'docs-publication/runtime/.generated/store/store-landing.tsx'), 'utf8');
   const imports = importSpecifiers(landing).map((entry) => entry.value);
-  assert.ok(imports.includes('@ilokesto/released-store'));
+  assert.ok(imports.includes('./store-demo'));
+  const storeDemo = await readFile(path.join(root, 'docs-publication/runtime/.generated/store/store-demo.tsx'), 'utf8');
+  assert.ok(importSpecifiers(storeDemo).some((entry) => entry.value === '@ilokesto/released-store'));
   assert.ok(imports.includes('@/components/landings/landing-shell'));
   assert.ok(imports.includes('@/components/landings/store-landing.module.css'));
   const fetcher = await readFile(path.join(root, 'docs-publication/runtime/.generated/fetcher/fetcher-demo.tsx'), 'utf8');

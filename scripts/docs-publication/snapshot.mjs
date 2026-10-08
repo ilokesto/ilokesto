@@ -70,9 +70,9 @@ function sourcePayload(rootDir, entry) {
   }
   const runtimeEntries = gitEntries(rootDir, entry.releaseCommit, [`packages/${name}`]).filter((record) => !isDocs(record.path));
   const runtimeFiles = inventory(gitFiles(rootDir, runtimeEntries)).map((record, index) => ({ ...record, blob: runtimeEntries[index].blob, mode: runtimeEntries[index].mode }));
-  const examples = collectExamples(rootDir, entry.releaseCommit, name);
+  const examples = collectExamples(rootDir, entry.docsCommit, name);
   for (const [file, bytes] of examples.files) files.set(`examples/${file}`, bytes);
-  return { files, sources, runtimeFiles, examples: { commit: entry.releaseCommit, files: examples.entries } };
+  return { files, sources, runtimeFiles, examples: { commit: entry.docsCommit, files: examples.entries } };
 }
 function unpackAndVerify({ tarball, entry, releaseFiles, sourceManifest, dependencyVersions }) {
   const name = entry.name.slice('@ilokesto/'.length);
@@ -115,7 +115,7 @@ export function buildSnapshot({ rootDir, entry, tarball, report }) {
   source.files.set('npm/package.tgz', tarball);
   source.files.set('provenance/release-provenance.md', report);
   const receipt = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     package: entry,
     releaseSource: source.sources.release,
     docsRevision: source.sources.revision,
@@ -211,12 +211,20 @@ export async function verifySnapshot({ rootDir, entry }) {
   const receipt = JSON.parse(files.get('receipt.json'));
   const { receiptSha256, ...identity } = entry;
   equal(receipt.package, identity, `${entry.name} receipt identity`);
-  equal(receipt.schemaVersion, 1, 'receipt schema');
+  invariant([1, 2].includes(receipt.schemaVersion), 'unsupported receipt schema');
   equal(receipt.releaseSource.commit, entry.releaseCommit, 'release commit');
   equal(receipt.docsRevision.commit, entry.docsCommit, 'docs revision commit');
+  equal(receipt.runtimeSource.commit, entry.releaseCommit, 'runtime source commit');
+  equal(receipt.exampleSource.commit, receipt.schemaVersion === 1 ? entry.releaseCommit : entry.docsCommit, 'example source commit');
   const payload = new Map(files);
   payload.delete('receipt.json');
   equal(inventory(payload), receipt.files, `${entry.name} snapshot file inventory/bytes/SHA-256`);
+  equal([...files.keys()].filter((file) => file.startsWith('examples/')).sort(), receipt.exampleSource.files.map((file) => `examples/${file.path}`), 'example source inventory');
+  for (const source of receipt.exampleSource.files) {
+    const bytes = files.get(`examples/${source.path}`);
+    invariant(['100644', '100755'].includes(source.mode), 'unsupported example source mode');
+    equal(hash(Buffer.concat([Buffer.from(`blob ${bytes.length}\0`), bytes]), 'sha1'), source.blob, `example source blob ${source.path}`);
+  }
   equal(receipt.registry.integrity, auditedRelease(entry).integrity, 'audited registry integrity');
   equal(`sha512-${hash(files.get('npm/package.tgz'), 'sha512', 'base64')}`, receipt.registry.integrity, 'npm tarball SRI');
   equal(inventory(tarFiles(files.get('npm/package.tgz'))), receipt.registry.files, 'npm package inventory');

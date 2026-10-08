@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import styles from '../landings/store-landing.module.css';
+import { DemoCode } from './demo-code';
 
 export type DemoProps = { readonly lang: 'en' | 'ko' };
 
@@ -34,18 +35,10 @@ export function DemoFrame({
     >
       <div className={styles.sceneControls}>
         <h2 className={styles.sceneTitle}>{title}</h2>
-        <p className="sr-only">{description}</p>
-        <div className="space-y-4">{children}</div>
+        <p className={styles.sceneDescription}>{description}</p>
+        <div className={styles.sceneBody}>{children}</div>
       </div>
-      <div className={styles.codePanel}>
-        <div className={styles.codeHeader}>
-          <span>{name}.tsx</span>
-          <span>{lang === 'ko' ? '핵심 코드' : 'Core snippet'}</span>
-        </div>
-        <pre tabIndex={0} aria-label={lang === 'ko' ? '예제 코드' : 'Example code'} className={styles.sceneCode}>
-          <code>{code}</code>
-        </pre>
-      </div>
+      <DemoCode lang={lang} name={name} code={code} />
     </section>
   );
 }
