@@ -115,6 +115,7 @@ test("full and selected verification preserve every specialized package check", 
   const checks = [
     ["form", "test:pack"],
     ["state", "test:typecheck"],
+    ["state", "test:browser"],
     ["modal", "exec playwright install --with-deps chromium"],
     ["modal", "test:pack"],
     ["modal", "test:e2e"],
@@ -137,6 +138,21 @@ test("full and selected verification preserve every specialized package check", 
       assert.notEqual(step["continue-on-error"], true);
     }
   }
+});
+
+test("selected state browser checks install Chromium before native storage tests", async () => {
+  const { jobs } = parse(await readWorkflow("ci.yml"));
+  const steps = jobs.packages.steps;
+  const install = steps.findIndex((step) =>
+    step.run === "pnpm --filter @ilokesto/state exec playwright install --with-deps chromium",
+  );
+  const tests = steps.findIndex((step) =>
+    step.run === "pnpm --filter @ilokesto/state test:browser",
+  );
+
+  assert.ok(install >= 0);
+  assert.ok(install < tests);
+  assert.equal(steps[install].if, "matrix.package == '@ilokesto/state'");
 });
 
 test("required verify always aggregates planning and both execution paths without checkout", async () => {

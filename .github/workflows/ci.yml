@@ -159,6 +159,9 @@ jobs:
       - name: Typecheck state tests
         run: pnpm --filter @ilokesto/state test:typecheck
 
+      - name: Test state native storage
+        run: pnpm --filter @ilokesto/state test:browser
+
       - name: Verify modal package
         run: pnpm --filter @ilokesto/modal test:pack
 
@@ -224,6 +227,14 @@ jobs:
       - name: Typecheck state tests
         if: matrix.package == '@ilokesto/state'
         run: pnpm --filter @ilokesto/state test:typecheck
+
+      - name: Install state browser
+        if: matrix.package == '@ilokesto/state'
+        run: pnpm --filter @ilokesto/state exec playwright install --with-deps chromium
+
+      - name: Test state native storage
+        if: matrix.package == '@ilokesto/state'
+        run: pnpm --filter @ilokesto/state test:browser
 
       - name: Install Playwright Chromium
         if: matrix.package == '@ilokesto/modal'
