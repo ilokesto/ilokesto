@@ -5,7 +5,7 @@
     "form": "@ilokesto/form@2.0.0(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))",
     "modal": "@ilokesto/modal@2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)",
     "overlay": "@ilokesto/overlay@2.0.0(react@19.2.8)",
-    "state": "@ilokesto/state@2.0.0(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))",
+    "state": "@ilokesto/state@2.0.1(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))",
     "store": "@ilokesto/store@2.0.0",
     "toast": "@ilokesto/toast@2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)",
     "utilinent": "@ilokesto/utilinent@1.2.0(react@19.2.8)",
@@ -52,12 +52,12 @@
         "react": "react@19.2.8"
       }
     },
-    "@ilokesto/state@2.0.0(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))": {
+    "@ilokesto/state@2.0.1(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))": {
       "name": "@ilokesto/state",
-      "version": "2.0.0",
-      "integrity": "sha512-GOg2Ovmq8qqqQfozizHhQ4hV+kWQ8DmmYmKsQJCMOZpAfG2nDqt5j8sl2jMJ0PdHWr13UJQ+ZQpTDH8Qy5m7IQ==",
+      "version": "2.0.1",
+      "integrity": "sha512-JOM3S4GnQHIhTwXtLTcmr6vU3q8jv/NiiSPjWaY8eM0jUlpAGV0xsBfGvmebyaUehqmJ/lRy/alMa6JM63p91g==",
       "dependencies": {
-        "@ilokesto/store": "@ilokesto/store@2.0.0",
+        "@ilokesto/store": "@ilokesto/store@2.0.1",
         "react": "react@19.2.8"
       }
     },
@@ -65,6 +65,12 @@
       "name": "@ilokesto/store",
       "version": "2.0.0",
       "integrity": "sha512-ezW/FizFYp6yV/cwdIi7KrDN01sSRS38CC48ozkwm6UyIs0N7dNjaWaZOlVmZCieHWm9pQKxD1Z+7EVnYet82A==",
+      "dependencies": {}
+    },
+    "@ilokesto/store@2.0.1": {
+      "name": "@ilokesto/store",
+      "version": "2.0.1",
+      "integrity": "sha512-tHmRp+QUR2297W4vhyQpQ3iLHw70INEuTVPdlsPbaurkNDqD81BYXEgb3Fsh6Vqcv0DH8v1QkBkUYfgUeR5ZBQ==",
       "dependencies": {}
     },
     "@ilokesto/toast@2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)": {

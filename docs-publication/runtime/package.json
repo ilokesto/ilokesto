@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@ilokesto/released-store": "npm:@ilokesto/store@2.0.0",
-    "@ilokesto/released-state": "npm:@ilokesto/state@2.0.0",
+    "@ilokesto/released-state": "npm:@ilokesto/state@2.0.1",
     "@ilokesto/released-form": "npm:@ilokesto/form@2.0.0",
     "@ilokesto/released-overlay": "npm:@ilokesto/overlay@2.0.0",
     "@ilokesto/released-modal": "npm:@ilokesto/modal@2.0.0",

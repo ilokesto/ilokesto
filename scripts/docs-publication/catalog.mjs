@@ -49,7 +49,31 @@ const initialReleases = Object.fromEntries(
 
 export const RELEASE_CATALOG = Object.freeze({
   ...initialReleases,
-  // Add independently audited name@version records without removing old ones.
+  '@ilokesto/state@2.0.1': Object.freeze({
+    name: '@ilokesto/state',
+    version: '2.0.1',
+    channel: 'latest',
+    integrity: 'sha512-JOM3S4GnQHIhTwXtLTcmr6vU3q8jv/NiiSPjWaY8eM0jUlpAGV0xsBfGvmebyaUehqmJ/lRy/alMa6JM63p91g==',
+    docsTree: '2e9f141f1fda8212bddd4fb0c8cb965971683476',
+    tarball: 'https://registry.npmjs.org/@ilokesto/state/-/state-2.0.1.tgz',
+    releaseCommit: 'e97069d019f2147f1f82201a2ac5b2c84f80c898',
+    reportSha256: '495deb6e10722ac270893c7465d16676fc31a779f95f562846bfb3c116f6cf2f',
+    provenance: Object.freeze({
+      kind: 'operational-evidence-not-cryptographic-source-provenance',
+      report: 'release-provenance.md',
+      observedAt: '2026-10-09',
+      publishRun: 'https://github.com/ilokesto/ilokesto/actions/runs/37914157814',
+      publishCheckout: 'e97069d019f2147f1f82201a2ac5b2c84f80c898',
+      npmGitHead: null,
+      npmAttestations: null,
+      evidence: [
+        'The successful Publish workflow and annotated State 2.0.1 tag identify the same release commit.',
+        'The exact-version tarball matches registry SHA-512 and SHA-1; both shipped READMEs match source blobs.',
+        'A frozen-lockfile build reproduced all 122 published State distribution files byte for byte.',
+      ],
+      limitation: 'npm exposes neither gitHead nor source provenance attestations for this version. Workflow, tag, and byte comparisons support the source association but do not cryptographically prove it.',
+    }),
+  }),
 });
 
 export function auditedRelease(entry) {

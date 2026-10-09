@@ -118,8 +118,8 @@ importers:
         specifier: npm:@ilokesto/overlay@2.0.0
         version: '@ilokesto/overlay@2.0.0(react@19.2.8)'
       '@ilokesto/released-state':
-        specifier: npm:@ilokesto/state@2.0.0
-        version: '@ilokesto/state@2.0.0(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))'
+        specifier: npm:@ilokesto/state@2.0.1
+        version: '@ilokesto/state@2.0.1(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))'
       '@ilokesto/released-store':
         specifier: npm:@ilokesto/store@2.0.0
         version: '@ilokesto/store@2.0.0'
@@ -1380,8 +1380,8 @@ packages:
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
-  '@ilokesto/state@2.0.0':
-    resolution: {integrity: sha512-GOg2Ovmq8qqqQfozizHhQ4hV+kWQ8DmmYmKsQJCMOZpAfG2nDqt5j8sl2jMJ0PdHWr13UJQ+ZQpTDH8Qy5m7IQ==}
+  '@ilokesto/state@2.0.1':
+    resolution: {integrity: sha512-JOM3S4GnQHIhTwXtLTcmr6vU3q8jv/NiiSPjWaY8eM0jUlpAGV0xsBfGvmebyaUehqmJ/lRy/alMa6JM63p91g==}
     peerDependencies:
       '@angular/core': ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0
       immer: ^9.0.12
@@ -1405,6 +1405,9 @@ packages:
 
   '@ilokesto/store@2.0.0':
     resolution: {integrity: sha512-ezW/FizFYp6yV/cwdIi7KrDN01sSRS38CC48ozkwm6UyIs0N7dNjaWaZOlVmZCieHWm9pQKxD1Z+7EVnYet82A==}
+
+  '@ilokesto/store@2.0.1':
+    resolution: {integrity: sha512-tHmRp+QUR2297W4vhyQpQ3iLHw70INEuTVPdlsPbaurkNDqD81BYXEgb3Fsh6Vqcv0DH8v1QkBkUYfgUeR5ZBQ==}
 
   '@ilokesto/toast@2.0.0':
     resolution: {integrity: sha512-n9nRqwC97SN/8ruE5mguRiT5EWg+Qi57zEAvx7tbkPoyhP9FbRAVDAJKq2+kOUrWTn2WpAei6zMMCxV20c9G9g==}
@@ -6545,9 +6548,9 @@ snapshots:
       '@ilokesto/store': 2.0.0
       react: 19.2.8
 
-  '@ilokesto/state@2.0.0(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))':
+  '@ilokesto/state@2.0.1(@angular/core@21.2.20(rxjs@7.8.2))(immer@9.0.21)(react@19.2.8)(solid-js@1.9.14)(svelte@5.56.9)(vue@3.5.41(typescript@6.0.3))':
     dependencies:
-      '@ilokesto/store': 2.0.0
+      '@ilokesto/store': 2.0.1
     optionalDependencies:
       '@angular/core': 21.2.20(rxjs@7.8.2)
       immer: 9.0.21
@@ -6557,6 +6560,8 @@ snapshots:
       vue: 3.5.41(typescript@6.0.3)
 
   '@ilokesto/store@2.0.0': {}
+
+  '@ilokesto/store@2.0.1': {}
 
   '@ilokesto/toast@2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:

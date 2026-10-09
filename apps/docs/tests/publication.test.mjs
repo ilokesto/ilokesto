@@ -21,6 +21,41 @@ test('the selected npm Store executes its published aggregate-delivery contract'
   assert.equal(secondListenerRan, true);
 });
 
+test('the selected npm State restores and saves through its explicit persist lifecycle', async (t) => {
+  const root = fileURLToPath(new URL('../../../', import.meta.url));
+  const installed = await resolveInstalledPackage('@ilokesto/released-state', path.join(root, 'docs-publication/runtime'));
+  assert.equal(installed.manifest.version, publishedPackages.state.version);
+  assert.ok(!installed.directory.startsWith(path.join(root, 'packages')));
+  const { dispose, persist } = await import(pathToFileURL(path.join(installed.directory, 'dist/middleware/index.js')).href);
+  const { pipe } = await import(pathToFileURL(path.join(installed.directory, 'dist/utils/index.js')).href);
+  const records = new Map([['counter', { state: 7, version: 0 }]]);
+  let reads = 0;
+  const store = pipe.use(persist({
+    key: 'counter',
+    storage: () => ({
+      getItem: async (key) => { reads++; return records.get(key) ?? null; },
+      setItem: async (key, value) => { records.set(key, value); },
+      removeItem: async (key) => { records.delete(key); },
+    }),
+    decode: (value) => typeof value === 'number' ? value : null,
+  })).create(0);
+  t.after(() => dispose(store));
+  assert.equal(reads, 0);
+  assert.equal(store.persist.getStatus().hydration, 'idle');
+
+  await store.persist.rehydrate();
+  assert.equal(store.getState(), 7);
+  assert.equal(reads, 1);
+  store.setState(8);
+  await store.persist.flush();
+
+  assert.deepEqual(records.get('counter'), { state: 8, version: 0 });
+  assert.equal(store.persist.getStatus().pending, false);
+  await store.persist.clearStorage();
+  assert.equal(records.has('counter'), false);
+  assert.equal(store.getState(), 8);
+});
+
 test('development links stay scoped without rewriting external destinations', () => {
   for (const name of Object.keys(publishedPackages)) {
     assert.equal(scopeDevelopmentLink(`/en/${name}/quick-start#install`), `/en/${name}/next/quick-start#install`);
