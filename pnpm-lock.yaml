@@ -365,7 +365,7 @@ importers:
   packages/modal:
     dependencies:
       '@ilokesto/overlay':
-        specifier: workspace:^2.0.0
+        specifier: workspace:^2.0.1
         version: link:../overlay
     devDependencies:
       '@arethetypeswrong/cli':
@@ -426,7 +426,7 @@ importers:
   packages/overlay:
     dependencies:
       '@ilokesto/store':
-        specifier: workspace:^2.0.0
+        specifier: workspace:^2.0.1
         version: link:../store
     devDependencies:
       '@testing-library/jest-dom':
@@ -518,10 +518,10 @@ importers:
   packages/toast:
     dependencies:
       '@ilokesto/overlay':
-        specifier: workspace:^2.0.0
+        specifier: workspace:^2.0.1
         version: link:../overlay
       '@ilokesto/store':
-        specifier: workspace:^2.0.0
+        specifier: workspace:^2.0.1
         version: link:../store
     devDependencies:
       '@testing-library/jest-dom':
