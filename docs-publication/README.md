@@ -23,6 +23,13 @@ Revision 2 selects the compact, stable landing examples reviewed at
 the same npm versions, release corpus, runtime aliases and dependency closure.
 Revision 1 archives remain available and unchanged.
 
+State now selects 2.0.1 revision 1 from release commit
+`e97069d019f2147f1f82201a2ac5b2c84f80c898`, publishing its redesigned persist
+API, migration guide, and supporting examples in both languages. Its runtime
+alias uses the exact npm release and resolves Store 2.0.1 transitively. The
+other seven public documentation selections and their runtime aliases remain
+unchanged. See `state-2.0.1-provenance.md` for the release evidence.
+
 These npm versions have registry signatures but no npm gitHead/source
 attestation. Workflow records, annotated tags, manifest/README matching and
 distribution comparisons support the source association. The receipts retain

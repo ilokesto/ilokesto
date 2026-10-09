@@ -36,7 +36,9 @@ for (const lang of ['en', 'ko']) {
         await expect(page.locator('[data-landing]')).toHaveAttribute(
           'data-runtime-version', channel === 'next' ? 'workspace' : publication.packages[name].version,
         );
-        const revised = channel === 'next' || publication.packages[name].revision > 1;
+        // A new npm version restarts revisions at 1 without reverting its demo.
+        const revised = channel === 'next'
+          || publication.packages[name].docsCommit !== 'fc8bd4755137b75767284dbe84a0774185dfbdde';
         if (revised) await expect(page.locator('[data-demo-code] .line span').first()).toBeVisible();
         await (revised ? currentDemoBehaviors : demoBehaviors)[name](page);
         assert.deepEqual(errors, []);

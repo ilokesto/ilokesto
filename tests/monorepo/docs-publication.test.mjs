@@ -41,10 +41,10 @@ test('all eight complete immutable snapshots verify against committed sources an
   for (const [name, snapshot] of verified.snapshots) {
     const entry = snapshot.entry;
     assert.equal(entry.docsCommit, candidate.packages[name].docsCommit);
-    assert.equal(entry.releaseCommit, RELEASE_COMMIT);
+    assert.equal(entry.releaseCommit, candidate.packages[name].releaseCommit);
     assert.equal(snapshot.receipt.schemaVersion, 2);
     assert.equal(snapshot.receipt.exampleSource.commit, entry.docsCommit);
-    assert.equal(snapshot.receipt.runtimeSource.commit, RELEASE_COMMIT);
+    assert.equal(snapshot.receipt.runtimeSource.commit, entry.releaseCommit);
     assert.equal(snapshot.receipt.registry.gitHead, null);
     assert.equal(snapshot.receipt.registry.attestations, null);
     assert.equal(snapshot.receipt.provenance.kind, 'operational-evidence-not-cryptographic-source-provenance');
@@ -56,7 +56,7 @@ test('all eight complete immutable snapshots verify against committed sources an
       if (file.startsWith('revision/docs/') && file.endsWith('.mdx')) mdxCount++;
       if (file.startsWith('release/') || file.startsWith('revision/')) {
         const [label, ...suffix] = file.split('/');
-        const source = label === 'release' ? RELEASE_COMMIT : entry.docsCommit;
+        const source = label === 'release' ? entry.releaseCommit : entry.docsCommit;
         assert.deepEqual(bytes, git(rootDir, ['show', `${source}:packages/${name}/${suffix.join('/')}`]));
       }
     }
@@ -79,12 +79,14 @@ test('the retained schema 1 archive still verifies with release-commit examples'
 test('new snapshots freeze revised examples and transitive helpers while retaining released runtime bytes', async (t) => {
   const root = await fixture(t);
   const original = await verifySnapshot({ rootDir: root, entry: candidate.packages.state });
+  const baseDocsCommit = original.entry.docsCommit;
+  const baseReleaseCommit = original.entry.releaseCommit;
   // An independent object database/index keeps fixture commits out of the repository.
   await rm(path.join(root, '.git'));
   git(root, ['init', '--quiet']);
   const commonDir = gitText(rootDir, ['rev-parse', '--path-format=absolute', '--git-common-dir']);
   await writeFile(path.join(root, '.git/objects/info/alternates'), `${commonDir}/objects\n`);
-  git(root, ['read-tree', docsCommit]);
+  git(root, ['read-tree', baseDocsCommit]);
   const sourcePath = 'apps/docs/components/demos/state-demo.tsx';
   const helperPath = 'apps/docs/components/demos/revision-helper.ts';
   const leafPath = 'apps/docs/components/demos/revision-leaf.ts';
@@ -97,7 +99,7 @@ test('new snapshots freeze revised examples and transitive helpers while retaini
   for (const [file, source] of sources) await writeFile(path.join(root, file), source);
   git(root, ['add', '--', ...sources.keys()]);
   const tree = gitText(root, ['write-tree']);
-  const revisionCommit = git(root, ['commit-tree', tree, '-p', docsCommit, '-m', 'Revise example fixture'], {
+  const revisionCommit = git(root, ['commit-tree', tree, '-p', baseDocsCommit, '-m', 'Revise example fixture'], {
     env: {
       ...process.env,
       GIT_AUTHOR_NAME: 'Publication Test', GIT_AUTHOR_EMAIL: 'publication@example.test',
@@ -105,9 +107,9 @@ test('new snapshots freeze revised examples and transitive helpers while retaini
       GIT_AUTHOR_DATE: '2026-10-08T00:00:00Z', GIT_COMMITTER_DATE: '2026-10-08T00:00:00Z',
     },
   }).toString().trim();
-  verifyDocsRevision({ rootDir: root, releaseCommit: RELEASE_COMMIT, docsCommit: revisionCommit, packageNames: ['state'] });
+  verifyDocsRevision({ rootDir: root, releaseCommit: baseReleaseCommit, docsCommit: revisionCommit, packageNames: ['state'] });
   for (const file of sources.keys()) await writeFile(path.join(root, file), 'uncommitted source must not be captured');
-  const identity = releaseEntry('state', RELEASE_COMMIT, revisionCommit, candidate.packages.state.revision + 1);
+  const identity = releaseEntry('state', baseReleaseCommit, revisionCommit, candidate.packages.state.revision + 1);
 
   const built = buildSnapshot({
     rootDir: root, entry: identity,
@@ -296,7 +298,7 @@ test('installation adaptation pins only package-install fences and shell install
   const adapted = adaptInstallations(document, candidate.packages);
   assert.deepEqual(adapted.split('\n').slice(0, 10), [
     '```package-install', '@ilokesto/fetcher@1.0.0 ky @ilokesto/store@2.0.0', '```',
-    '```bash', 'pnpm add @ilokesto/state@2.0.0 react', '$ npm install @ilokesto/form@2.0.0',
+    '```bash', 'pnpm add @ilokesto/state@2.0.1 react', '$ npm install @ilokesto/form@2.0.0',
     'yarn add @ilokesto/modal@2.0.0', 'bun add @ilokesto/toast@2.0.0', 'echo @ilokesto/store', '```',
   ]);
   assert.equal(adapted.split('\n').slice(10).join('\n'), document.split('\n').slice(10).join('\n'));
